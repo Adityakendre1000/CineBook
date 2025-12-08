@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import ToastContainer from "../components/ToastContainer";
+import ToastContainer from "../components/ToastConatiner";
 
 const ToastContext = createContext();
 
@@ -9,7 +9,7 @@ export const ToastProvider = ({ children }) => {
   const addToast = (message, type = "success") => {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message, type }]);
-    
+
     setTimeout(() => removeToast(id), 3000);
   };
 
