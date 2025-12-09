@@ -26,7 +26,8 @@ const App = () => {
         <Route path="/userview" element={<UserView />} />
         <Route path="/movie/:id" element={<MovieDetailPage />} />
         <Route path="/terms-and-services" element={<TermsAndServices />} />
-        <Route path="/theater-selection" element={<TheaterSelectionPage />} />
+        {/* Route for theater selection linked to specific movie */}
+        <Route path="/book/:id" element={<TheaterSelectionPage />} />
 
         
         <Route path="*" element={<ErrorPage />} />
