@@ -9,31 +9,27 @@ import UserView from './pages/UserView';
 import MovieDetailPage from './pages/MovieDetailPage';
 import TermsAndServices from './pages/TermsAndServices';
 import TheaterSelectionPage from './pages/TheaterSelectionPage';
-import ContactUs from './pages/ContactUs';
+import TheaterOwnerView from './pages/TheatereOwnerView';
 
 const App = () => {
   return (
-    <ToastProvider>
-      <Routes>
-        
-        <Route path="/" element={<Navigate to="/login" replace />} />
-
-        
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-
-        
-        <Route path="/about-us" element={<AboutUs />} />
-        <Route path="/userview" element={<UserView />} />
-        <Route path="/movie/:id" element={<MovieDetailPage />} />
-        <Route path="/terms-and-services" element={<TermsAndServices />} />
-        <Route path="/book/:id" element={<TheaterSelectionPage />} />
-        <Route path='/contact-us' element={<ContactUs />} />
-
-        
-        <Route path="*" element={<ErrorPage />} />
-      </Routes>
-    </ToastProvider>
+    <div className="w-full max-w-6xl mx-auto space-y-10 bg-[#1a1a1a] text-white">
+      <ToastProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/theaterowner" element={<TheaterOwnerView />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/userview" element={<UserView />} />
+          <Route path="/movie/:id" element={<MovieDetailPage />} />
+          <Route path="/terms-and-services" element={<TermsAndServices />} />
+          {/* Route for theater selection linked to specific movie */}
+          <Route path="/book/:id" element={<TheaterSelectionPage />} />
+          <Route path="*" element={<ErrorPage />} />
+        </Routes>
+      </ToastProvider>
+    </div>
   );
 };
 
