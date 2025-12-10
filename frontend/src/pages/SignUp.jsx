@@ -16,6 +16,8 @@ const SignUp = () => {
     password: '',
     confirmPassword: '',
     role: 'Customer',
+
+    // owner ke fields
     theaterName: '',
     address: '',
     city: '',
@@ -41,7 +43,7 @@ const SignUp = () => {
       alert('Passwords do not match.');
       return;
     }
-    // TODO: replace with real submit logic!
+    // TODO: submit logic here
     console.log('Sign up data:', formData);
   };
 
