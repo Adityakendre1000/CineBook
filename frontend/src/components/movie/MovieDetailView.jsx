@@ -7,9 +7,9 @@ const MovieDetailView = ({ movie, onBack, onBookTicket }) => {
         <>
             <div className="relative min-h-screen bg-[#1a1a1a] -mt-12">
 
-                {/* 1. Hero Section (Trailer) */}
+                {/* yt video part (Trailer) */}
                 <div className="relative w-full aspect-video bg-black sticky top-20 z-0">
-                    {/* Floating Back Button */}
+                    {/*  Back Button */}
                     <button
                         onClick={onBack}
                         className="absolute top-24 left-6 z-30 flex items-center gap-2 px-4 py-2 bg-black hover:bg-red-600/80 rounded-full text-white border border-white/10 group"
@@ -25,11 +25,11 @@ const MovieDetailView = ({ movie, onBack, onBookTicket }) => {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                     ></iframe>
-                    {/* Gradient Overlay */}
+                    
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent pointer-events-none"></div>
                 </div>
 
-                {/* 2. Scrollable Content Area */}
+                {/* Movie Details Section */}
                 <div className="relative z-10 bg-[#1a1a1a] -mt-32 pt-12 pb-32 rounded-t-3xl border-t border-white/5">
                     <div className="max-w-5xl mx-auto px-6 sm:px-8">
 
@@ -49,7 +49,7 @@ const MovieDetailView = ({ movie, onBack, onBookTicket }) => {
                             </p>
                         </div>
 
-                        {/* Cast & Crew Section */}
+                        {/* Cast & Crew  */}
                         <div className="mb-12">
                             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2"><Users size={20} className="text-red-500" /> Top Cast</h3>
                             <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
@@ -86,7 +86,7 @@ const MovieDetailView = ({ movie, onBack, onBookTicket }) => {
                     </div>
                 </div>
 
-                {/* 3. Sticky Booking Footer */}
+                {/*  Sticky Booking Footer */}
                 <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#1a1a1a] border-t border-white/10 p-4 sm:p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
                     <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
                         <div className="hidden sm:block">
