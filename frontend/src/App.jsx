@@ -11,6 +11,7 @@ import TermsAndServices from './pages/TermsAndServices';
 import TheaterSelectionPage from './pages/TheaterSelectionPage';
 import TheaterOwnerView from './pages/TheatereOwnerView';
 import SuperAdminView from './pages/SuperAdminView';
+import MyBookings from './pages/MyBookings';
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/terms-and-services" element={<TermsAndServices />} />
           <Route path="/superadmin" element={<SuperAdminView />} />
           <Route path="/book/:id" element={<TheaterSelectionPage />} />
+          <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </ToastProvider>
