@@ -1,4 +1,4 @@
-package com.cdac.MovieBooking.Entities.Dtos;
+package com.cdac.MovieBooking.Dtos.Response;
 
 import com.cdac.MovieBooking.Entities.Enums.Gender;
 import com.cdac.MovieBooking.Entities.Enums.UserRole;
@@ -6,7 +6,6 @@ import com.cdac.MovieBooking.Entities.Enums.UserStatus;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Builder

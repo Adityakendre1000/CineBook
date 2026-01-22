@@ -3,6 +3,7 @@ package com.cdac.MovieBooking.Entities;
 import com.cdac.MovieBooking.Entities.Enums.UserRole;
 import com.cdac.MovieBooking.Entities.Enums.Gender;
 import com.cdac.MovieBooking.Entities.Enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -44,6 +45,7 @@ public class User {
 
     @NotBlank(message = "Password is required")
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @NotNull(message = "Gender is required")
