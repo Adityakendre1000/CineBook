@@ -1,9 +1,9 @@
 package com.cdac.MovieBooking.Repository;
 
-import com.cdac.MovieBooking.Entities.Seat;
+import com.cdac.MovieBooking.Entities.ShowSeat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SeatRepo extends JpaRepository<Seat,Long> {
+public interface ShowSeatRepository extends JpaRepository<ShowSeat,Long> {
 }

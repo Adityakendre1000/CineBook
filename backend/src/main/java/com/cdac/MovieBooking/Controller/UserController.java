@@ -1,15 +1,10 @@
 package com.cdac.MovieBooking.Controller;
 
-import com.cdac.MovieBooking.Entities.Booking;
-import com.cdac.MovieBooking.Entities.Dtos.UserResponseDto;
-import com.cdac.MovieBooking.Entities.User;
+import com.cdac.MovieBooking.Dtos.Response.UserResponseDto;
 import com.cdac.MovieBooking.Service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
