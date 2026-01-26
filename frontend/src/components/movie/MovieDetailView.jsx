@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronLeft, Star, Clock, Film, Users, Ticket } from 'lucide-react';
-import PublicNavbar from '../PublicNavbar';
+import PublicNavbar from '../navbar/PublicNavbar';
 
 const MovieDetailView = ({ movie, onBack, onBookTicket }) => {
     return (
@@ -25,7 +25,7 @@ const MovieDetailView = ({ movie, onBack, onBookTicket }) => {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                     ></iframe>
-                    
+
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent pointer-events-none"></div>
                 </div>
 
