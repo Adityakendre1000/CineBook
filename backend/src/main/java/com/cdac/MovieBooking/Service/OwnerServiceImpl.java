@@ -1,10 +1,13 @@
 package com.cdac.MovieBooking.Service;
 
+import com.cdac.MovieBooking.Dtos.Request.AddScreenRequestDTO;
 import com.cdac.MovieBooking.Dtos.Request.AddTheatereRequestDTO;
 import com.cdac.MovieBooking.Entities.Enums.TheatreApprovalStatus;
 import com.cdac.MovieBooking.Entities.Enums.TheatreStatus;
+import com.cdac.MovieBooking.Entities.Screen;
 import com.cdac.MovieBooking.Entities.Theatre;
 import com.cdac.MovieBooking.Entities.User;
+import com.cdac.MovieBooking.Repository.ScreenRepository;
 import com.cdac.MovieBooking.Repository.TheatreRepository;
 import com.cdac.MovieBooking.Repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -44,4 +47,32 @@ public class OwnerServiceImpl implements OwnerService{
         return theatreRepository.save(theatre);
 
     }
+
+
+    private final ScreenRepository screenRepository;
+
+    @Override
+    public Screen addScreen(AddScreenRequestDTO requestDTO, Long OwnerID){
+        //s1 get by id
+        Theatre theatre = theatreRepository.findById(requestDTO.getTheatreId())
+                .orElseThrow(() -> new RuntimeException("Theatre not found"));
+
+        //s2 check if this ownere owns the theatre or not
+        if (!theatre.getOwner().getUserId().equals(OwnerID)) {
+            throw new RuntimeException("You do not own this theatre!");
+        }
+
+        //s3 building the entity
+        Screen screen = Screen.builder()
+                .theatre(theatre)
+                .screenNumber(requestDTO.getScreenNumber())
+                .totalSeats(requestDTO.getTotalSeats())
+                .isActive(true)
+                .build();
+
+        return screenRepository.save(screen);
+
+    }
+
+
 }
