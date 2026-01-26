@@ -3,7 +3,6 @@ package com.cdac.MovieBooking.Service;
 import com.cdac.MovieBooking.Dtos.Request.UserUpdateRequest;
 import com.cdac.MovieBooking.Dtos.Response.BookingResponse;
 import com.cdac.MovieBooking.Dtos.Response.UserResponseDto;
-import com.cdac.MovieBooking.Entities.Booking;
 import com.cdac.MovieBooking.Entities.User;
 import com.cdac.MovieBooking.Exception.ResourceNotFoundException;
 import com.cdac.MovieBooking.Repository.BookingRepository;
@@ -12,8 +11,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -63,7 +60,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public List<BookingResponse> getBookings(Long userId) {
 
-        User user = ur.findById(userId)
+        ur.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
 

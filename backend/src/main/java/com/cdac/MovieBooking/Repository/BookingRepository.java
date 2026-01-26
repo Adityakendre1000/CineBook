@@ -1,7 +1,6 @@
 package com.cdac.MovieBooking.Repository;
 
 import com.cdac.MovieBooking.Entities.Booking;
-import com.cdac.MovieBooking.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
