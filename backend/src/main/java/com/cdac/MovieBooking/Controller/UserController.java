@@ -1,8 +1,10 @@
 package com.cdac.MovieBooking.Controller;
 
+import com.cdac.MovieBooking.Dtos.Response.ApiResponse;
 import com.cdac.MovieBooking.Dtos.Response.UserResponseDto;
 import com.cdac.MovieBooking.Service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +15,19 @@ public class UserController {
 
     private final UserService us;
 
-    //get user details by email
+    // get user details by email
     @GetMapping("/by-email")
-    ResponseEntity<UserResponseDto> getUserByEmail(@RequestParam String userEmail){
-        return ResponseEntity.ok(us.getUserByEmail(userEmail));
-//        return ResponseEntity.ok("Hello"+userEmail);
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUserByEmail(
+            @RequestParam String userEmail) {
+
+        UserResponseDto user = us.getUserByEmail(userEmail);
+
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(ApiResponse.success("User fetched successfully", user));
     }
+
+
+    //get current user details
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUser()
 }

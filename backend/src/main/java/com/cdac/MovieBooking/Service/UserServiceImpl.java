@@ -20,7 +20,11 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserResponseDto getUserByEmail(String userEmail) {
-        Optional<User> user = ur.findByEmail(userEmail);
+        User user = ur.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found with email: " + userEmail));
+
         return modelMapper.map(user,UserResponseDto.class);
     }
+
 }

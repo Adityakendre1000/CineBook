@@ -44,6 +44,25 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+                        // PUBLIC ENDPOINTS
+                        .requestMatchers(
+                                "/auth/**",
+                                "/public/**",
+                                "/error",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        // ROLE BASED
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/owner/**").hasRole("OWNER")
+                        .requestMatchers("/user/**").hasAnyRole("USER", "OWNER", "ADMIN")
+
+                        .anyRequest().authenticated()
+                )
+
+                .authorizeHttpRequests(auth -> auth
                         // PUBLIC
                         .requestMatchers("/auth/**","/public/**","/error").permitAll()
 
