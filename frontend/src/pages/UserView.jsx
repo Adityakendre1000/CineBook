@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PublicNavbar from '../components/navbar/PublicNavbar';
 import { useNavigate } from 'react-router-dom';
 
 import { MOCK_MOVIES, MOCK_THEATERS } from '../data/mockData';
@@ -22,7 +21,6 @@ const CustomerView = () => {
 
     return (
         <>
-            <PublicNavbar />
             <div className="min-h-screen bg-[#1a1a1a] flex flex-col items-center p-4 pt-24 relative overflow-hidden">
                 <div className="w-full max-w-5xl mb-8">
                     <h1 className="text-3xl font-extrabold text-white tracking-tight mb-4">

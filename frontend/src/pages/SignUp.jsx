@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Mail, Phone, Smile, ChevronDown, Calendar, Lock } from 'lucide-react';
-import PublicNavbar from '../components/navbar/PublicNavbar';
+import { register } from '../services/authService';
+import { useToast } from '../context/ToastContext';
 
 // Signup form with role toggle (Customer/Theater Owner)
 const SignUp = () => {
@@ -25,6 +26,7 @@ const SignUp = () => {
   });
 
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   // Generic change handler for inputs/selects
   const handleChange = (e) => {
@@ -37,20 +39,42 @@ const SignUp = () => {
   };
 
   // Submit handler with password check
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match.');
+      addToast('Passwords do not match', 'error');
       return;
     }
-    // TODO: submit logic here
-    console.log('Sign up data:', formData);
+
+    try {
+      await register({
+        firstName: formData.fname,
+        lastName: formData.lname,
+        email: formData.email,
+        password: formData.password,
+        gender: formData.gender.toUpperCase(),
+        dob: formData.dob,
+        mobileNo: formData.phone,
+        userRole:
+          formData.role === 'Customer'
+            ? 'ROLE_USER'
+            : 'ROLE_OWNER',
+      });
+
+      addToast('Registration successful. Please login.', 'success');
+      navigate('/login');
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        'Registration failed. Please try again.';
+      addToast(message, 'error');
+    }
   };
 
   return (
     <>
-      <PublicNavbar />
-      <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center p-4 pt-24 relative overflow-hidden">
+      <div className="min-h-screen bg-[#1a1a1a] flex justify-center p-4 relative overflow-hidden">
         <div className="w-full max-w-2xl bg-[#1e1e1e] border border-white/10 p-8 rounded-3xl relative z-10">
           {/* Header */}
           <div className="text-center mb-8">

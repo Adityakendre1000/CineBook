@@ -3,7 +3,7 @@ import { Film, User, Lock, AlertCircle, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-import PublicNavbar from "../components/navbar/PublicNavbar";
+
 import { login } from "../services/authService";
 import { loginSuccess } from "../store/authSlice";
 import { useToast } from "../context/ToastContext";
@@ -55,9 +55,7 @@ const Login = () => {
 
     return (
         <>
-            <PublicNavbar />
-
-            <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center p-4 pt-24 relative overflow-hidden">
+            <div className="min-h-screen bg-[#1a1a1a] flex justify-center p-4 relative overflow-hidden">
                 <div className="w-full max-w-md bg-[#1e1e1e] border border-white/10 p-8 rounded-3xl relative z-10">
                     {/* Header */}
                     <div className="text-center mb-8">

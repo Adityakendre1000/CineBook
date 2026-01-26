@@ -19,41 +19,44 @@ import Navbar from "./components/navbar/Navbar";
 
 const App = () => {
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-10 bg-[#1a1a1a] text-white">
+    <div className="min-h-screen bg-[#1a1a1a] text-white">
       <Navbar />
-      <ToastProvider>
-        <Routes>
-          {/* DEFAULT */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
 
-          {/* PUBLIC ROUTES */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/terms-and-services" element={<TermsAndServices />} />
-          <Route path="/movie/:id" element={<MovieDetailPage />} />
+      <div className="max-w-6xl mx-auto px-4 pt-6">
+        <ToastProvider>
+          <Routes>
+            {/* DEFAULT */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
 
-          {/* USER ROUTES */}
-          <Route element={<ProtectedRoute allowedRoles={["ROLE_USER"]} />}>
-            <Route path="/userview" element={<UserView />} />
-            <Route path="/my-bookings" element={<MyBookings />} />
-            <Route path="/book/:id" element={<TheaterSelectionPage />} />
-          </Route>
+            {/* PUBLIC ROUTES */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/terms-and-services" element={<TermsAndServices />} />
+            <Route path="/movie/:id" element={<MovieDetailPage />} />
 
-          {/* THEATER OWNER ROUTES */}
-          <Route element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]} />}>
-            <Route path="/theaterowner" element={<TheaterOwnerView />} />
-          </Route>
+            {/* USER ROUTES */}
+            <Route element={<ProtectedRoute allowedRoles={["ROLE_USER"]} />}>
+              <Route path="/userview" element={<UserView />} />
+              <Route path="/my-bookings" element={<MyBookings />} />
+              <Route path="/book/:id" element={<TheaterSelectionPage />} />
+            </Route>
 
-          {/* SUPER ADMIN ROUTES */}
-          <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
-            <Route path="/superadmin" element={<SuperAdminView />} />
-          </Route>
+            {/* THEATER OWNER ROUTES */}
+            <Route element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]} />}>
+              <Route path="/theaterowner" element={<TheaterOwnerView />} />
+            </Route>
 
-          {/* FALLBACK */}
-          <Route path="*" element={<ErrorPage />} />
-        </Routes>
-      </ToastProvider>
+            {/* SUPER ADMIN ROUTES */}
+            <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
+              <Route path="/superadmin" element={<SuperAdminView />} />
+            </Route>
+
+            {/* FALLBACK */}
+            <Route path="*" element={<ErrorPage />} />
+          </Routes>
+        </ToastProvider>
+      </div>
     </div>
   );
 };

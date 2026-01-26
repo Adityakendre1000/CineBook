@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { logout as logoutRedux } from "../../store/authSlice";
 import { logout as logoutService } from "../../services/authService";
+import CineBookBrand from "./CineBookBrand";
 
 const AdminNavbar = () => {
     const dispatch = useDispatch();
@@ -17,14 +18,20 @@ const AdminNavbar = () => {
 
     return (
         <nav className="p-6 flex justify-between items-center">
-            <h2 className="text-xl font-bold">CineBook (Admin)</h2>
+            {/* CineBook logo + name */}
+            <CineBookBrand to="/superadmin" />
 
             <div className="flex items-center gap-6">
-                <button onClick={() => navigate("/superadmin")}>Dashboard</button>
+                <button
+                    onClick={() => navigate("/superadmin")}
+                    className="cursor-pointer hover:text-gray-300"
+                >
+                    Dashboard
+                </button>
 
                 <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 text-red-400 hover:text-red-300"
+                    className="flex items-center gap-2 cursor-pointer text-red-400 hover:text-red-300"
                 >
                     <LogOut size={18} />
                     Logout
