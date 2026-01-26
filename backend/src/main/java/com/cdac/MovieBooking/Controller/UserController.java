@@ -2,6 +2,7 @@ package com.cdac.MovieBooking.Controller;
 
 import com.cdac.MovieBooking.Dtos.Request.UserUpdateRequest;
 import com.cdac.MovieBooking.Dtos.Response.ApiResponse;
+import com.cdac.MovieBooking.Dtos.Response.BookingResponse;
 import com.cdac.MovieBooking.Dtos.Response.UserResponseDto;
 import com.cdac.MovieBooking.Security.CustomUserDetails;
 import com.cdac.MovieBooking.Service.UserService;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,6 +53,7 @@ public class UserController {
 
     }
 
+    //update user
     @PutMapping("/update-user")
     public ResponseEntity<ApiResponse<UserUpdateRequest>> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -63,5 +67,21 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success("User Details updated successfully", user));
+    }
+
+    //see all movie bookings for a user
+    @GetMapping("/bookings")
+    public ResponseEntity<ApiResponse<List<BookingResponse>>> getBookings(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = null;
+        if (userDetails != null) {
+            userId = userDetails.getUserId();
+        }
+
+        List<BookingResponse> bookings = us.getBookings(userId);
+
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(ApiResponse.success("Bookings fetched successfully", bookings));
     }
 }

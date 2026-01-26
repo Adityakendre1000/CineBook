@@ -1,14 +1,20 @@
 package com.cdac.MovieBooking.Service;
 
 import com.cdac.MovieBooking.Dtos.Request.UserUpdateRequest;
+import com.cdac.MovieBooking.Dtos.Response.BookingResponse;
 import com.cdac.MovieBooking.Dtos.Response.UserResponseDto;
+import com.cdac.MovieBooking.Entities.Booking;
 import com.cdac.MovieBooking.Entities.User;
 import com.cdac.MovieBooking.Exception.ResourceNotFoundException;
+import com.cdac.MovieBooking.Repository.BookingRepository;
 import com.cdac.MovieBooking.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -17,6 +23,7 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository ur;
     private final ModelMapper modelMapper;
+    private final BookingRepository br;
 
     @Override
     public UserResponseDto getUserByEmail(String userEmail) {
@@ -51,6 +58,38 @@ public class UserServiceImpl implements UserService{
 
         ur.save(user);
         return modelMapper.map(user,UserUpdateRequest.class);
+    }
+
+    @Override
+    public List<BookingResponse> getBookings(Long userId) {
+
+        User user = ur.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+
+        return br.findAllBookingsByUserId(userId)
+                .stream()
+                .map(booking -> BookingResponse.builder()
+                        .bookingId(booking.getBookingId())
+                        .bookingStatus(booking.getBookingStatus())
+                        .bookingTime(booking.getBookingTime())
+                        .totalAmount(booking.getTotalAmount())
+                        .showId(booking.getShow().getShowId())
+                        .showTime(booking.getShow().getShowTime())
+                        .showPrice(booking.getShow().getPrice())
+                        .movieId(booking.getShow().getMovie().getMovieId())
+                        .movieTitle(booking.getShow().getMovie().getTitle())
+                        .language(booking.getShow().getMovie().getLanguage())
+                        .genre(booking.getShow().getMovie().getGenre())
+                        .durationMinutes(booking.getShow().getMovie().getDurationMinutes())
+                        .posterUrl(booking.getShow().getMovie().getPosterUrl())
+
+                        .theatreId(booking.getShow().getScreen().getTheatre().getTheatreId())
+                        .theatreName(booking.getShow().getScreen().getTheatre().getTheatreName())
+                        .screenNumber(booking.getShow().getScreen().getScreenNumber())
+
+                        .build())
+                .toList();
     }
 
 }
