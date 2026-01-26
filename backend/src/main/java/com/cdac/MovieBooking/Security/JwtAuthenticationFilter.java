@@ -23,6 +23,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService customUserDetailsService;
 
+    /**
+     * This method tells Spring Security when to SKIP this JWT filter.
+     *
+     * We do NOT want to check JWT tokens for:
+     * 1) /auth/** endpoints (login & register)
+     *    → because users don’t have a token yet
+     *
+     * 2) OPTIONS requests
+     *    → these are CORS preflight requests sent by the browser
+     *    → they do not contain JWT tokens
+     *
+     * If this method returns true:
+     * → Spring Security will NOT run doFilterInternal()
+     * → JWT validation is skipped for that request
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/auth/")
+                || request.getMethod().equalsIgnoreCase("OPTIONS");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
