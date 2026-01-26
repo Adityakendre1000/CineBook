@@ -4,6 +4,7 @@ import com.cdac.MovieBooking.Dtos.Request.LoginRequest;
 import com.cdac.MovieBooking.Dtos.Request.RegisterRequest;
 import com.cdac.MovieBooking.Dtos.Response.LoginResponse;
 import com.cdac.MovieBooking.Dtos.Response.RegisterResponse;
+import com.cdac.MovieBooking.Dtos.Response.UserResponse;
 import com.cdac.MovieBooking.Entities.Enums.UserRole;
 import com.cdac.MovieBooking.Entities.Enums.UserStatus;
 import com.cdac.MovieBooking.Entities.User;
@@ -71,14 +72,29 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
 
+        // Fetch user from DB (email is principal)
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         String token = jwtUtil.generateToken(authentication);
 
         return LoginResponse.builder()
                 .success(true)
                 .message("Login successful")
                 .token(token)
+                .user(
+                        UserResponse.builder()
+                                .userId(user.getUserId())
+                                .firstName(user.getFirstName())
+                                .lastName(user.getLastName())
+                                .email(user.getEmail())
+                                .gender(user.getGender())
+                                .role(user.getUserRole())
+                                .build()
+                )
                 .build();
     }
+
 
     // ========================= ROLE VALIDATION =========================
     private UserRole validateRole(UserRole requestedRole) {
