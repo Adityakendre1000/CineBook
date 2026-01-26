@@ -3,7 +3,7 @@ import { Film, User, Lock, AlertCircle, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-import PublicNavbar from "../components/PublicNavbar";
+import PublicNavbar from "../components/navbar/PublicNavbar";
 import { login } from "../services/authService";
 import { loginSuccess } from "../store/authSlice";
 import { useToast } from "../context/ToastContext";

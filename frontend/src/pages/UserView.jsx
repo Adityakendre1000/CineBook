@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PublicNavbar from '../components/PublicNavbar';
+import PublicNavbar from '../components/navbar/PublicNavbar';
 import { useNavigate } from 'react-router-dom';
 
 import { MOCK_MOVIES, MOCK_THEATERS } from '../data/mockData';
