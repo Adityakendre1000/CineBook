@@ -37,6 +37,7 @@ public class JwtUtil {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMilliseconds);
 
+        //JWT token has Uname, Uid, Role, CreatedTime, ExpiryTime on its body and algorithm on it's header.
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("userId", userDetails.getUserId())
