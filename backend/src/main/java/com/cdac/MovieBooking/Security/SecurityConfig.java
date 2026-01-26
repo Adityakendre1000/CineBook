@@ -42,15 +42,10 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                //here last 3 req matchers(ui,ui.html,docks) are for swagger
+
                 .authorizeHttpRequests(auth -> auth
                         // PUBLIC
-                        .requestMatchers("/auth/**","/public/**",
-                                "/v3/api-docs",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
+                        .requestMatchers("/auth/**","/public/**","/error").permitAll()
 
                         // ROLE BASED
                         .requestMatchers("/admin/**").hasRole("ADMIN")
