@@ -1,6 +1,5 @@
 package com.cdac.MovieBooking.Security;
 
-import com.cdac.MovieBooking.Security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,24 +37,26 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // PUBLIC
-                        .requestMatchers("/auth/**","/public/**","/error").permitAll()
+                        // PUBLIC ENDPOINTS
+                        .requestMatchers(
+                                "/auth/**",
+                                "/public/**",
+                                "/error",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
 
                         // ROLE BASED
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/owner/**").hasRole("OWNER")
-                        .requestMatchers("/user/**")
-                        .hasAnyRole("USER", "OWNER", "ADMIN")
+                        .requestMatchers("/user/**").hasAnyRole("USER")
 
+                        // ANY OTHER REQUEST
                         .anyRequest().authenticated()
                 )
-
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
