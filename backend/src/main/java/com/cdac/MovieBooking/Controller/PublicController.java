@@ -53,9 +53,7 @@ public class PublicController {
 
     // API 5: Get shows by movie
     @GetMapping("/movies/{movieId}/shows")
-    public ResponseEntity<ApiResponse<List<ShowResponseDTO>>> getShowsByMovie(
-            @PathVariable Long movieId
-    ) {
+    public ResponseEntity<ApiResponse<List<ShowResponseDTO>>> getShowsByMovie(@PathVariable Long movieId) {
         return ResponseEntity.ok(
                 ApiResponse.success("Shows fetched successfully",
                         publicService.getShowsByMovie(movieId))

@@ -21,6 +21,9 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookingId;
 
+    @Column(unique = true)
+    private String razorpayOrderId;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
