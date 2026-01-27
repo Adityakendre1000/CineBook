@@ -39,11 +39,7 @@ const ownerService = {
                 return {
                     ...mockTheatre,
                     description: "Premium cinema experience with 4K projection and Dolby Atmos. (Mock Description)",
-                    screens: [
-                        { id: 1, name: "Screen 1", type: "Standard", capacity: 150 },
-                        { id: 2, name: "Screen 2", type: "IMAX", capacity: 240 },
-                        { id: 3, name: "Screen 3", type: "Gold Class", capacity: 80 },
-                    ]
+                    // screens: mockTheatre.screens // Use the screens from the mock object
                 };
             }
             return null;
