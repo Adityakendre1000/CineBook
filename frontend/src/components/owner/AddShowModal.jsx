@@ -2,13 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { X, Calendar, Clock, Monitor } from 'lucide-react';
 import { MOCK_MOVIES } from '../../data/mockData';
 
-const SEAT_MULTIPLIERS = {
-    NORMAL: 1.0,
-    PRIME: 1.5,
-    RECLINER: 3.0
-};
-
-// Mock Counts for the static layout
 const SEAT_COUNTS = {
     NORMAL: 45, // Rows A, B, C (3 * 15)
     PRIME: 30,  // Rows D, E (2 * 15)
@@ -21,32 +14,30 @@ const AddShowModal = ({ isOpen, onClose, theatreName, onSubmit }) => {
         screenId: '',
         date: '',
         time: '',
-        basePrice: ''
+        priceNormal: '',
+        pricePrime: '',
+        priceRecliner: ''
     });
 
     const [pricingPreview, setPricingPreview] = useState(null);
 
     useEffect(() => {
-        if (formData.basePrice) {
-            const base = parseFloat(formData.basePrice);
-            if (!isNaN(base)) {
-                setPricingPreview({
-                    NORMAL: base * SEAT_MULTIPLIERS.NORMAL,
-                    PRIME: base * SEAT_MULTIPLIERS.PRIME,
-                    RECLINER: base * SEAT_MULTIPLIERS.RECLINER,
-                    totalPotential: (
-                        (base * SEAT_MULTIPLIERS.NORMAL * SEAT_COUNTS.NORMAL) +
-                        (base * SEAT_MULTIPLIERS.PRIME * SEAT_COUNTS.PRIME) +
-                        (base * SEAT_MULTIPLIERS.RECLINER * SEAT_COUNTS.RECLINER)
-                    )
-                });
-            } else {
-                setPricingPreview(null);
-            }
+        const normal = parseFloat(formData.priceNormal) || 0;
+        const prime = parseFloat(formData.pricePrime) || 0;
+        const recliner = parseFloat(formData.priceRecliner) || 0;
+
+        if (normal > 0 || prime > 0 || recliner > 0) {
+            setPricingPreview({
+                totalPotential: (
+                    (normal * SEAT_COUNTS.NORMAL) +
+                    (prime * SEAT_COUNTS.PRIME) +
+                    (recliner * SEAT_COUNTS.RECLINER)
+                )
+            });
         } else {
             setPricingPreview(null);
         }
-    }, [formData.basePrice]);
+    }, [formData.priceNormal, formData.pricePrime, formData.priceRecliner]);
 
     if (!isOpen) return null;
 
@@ -59,9 +50,13 @@ const AddShowModal = ({ isOpen, onClose, theatreName, onSubmit }) => {
         const newShow = {
             id: Date.now(),
             movie: selectedMovie.title,
-            time: formData.time, // simplified
+            time: formData.time,
             screen: formData.screenId,
-            basePrice: formData.basePrice
+            prices: {
+                NORMAL: formData.priceNormal,
+                PRIME: formData.pricePrime,
+                RECLINER: formData.priceRecliner
+            }
         };
         onSubmit(newShow);
         onClose();
@@ -145,61 +140,77 @@ const AddShowModal = ({ isOpen, onClose, theatreName, onSubmit }) => {
                             </div>
                         </div>
 
-                        {/* Pricing Section */}
+                        {/* Pricing Section - MANUAL INPUTS */}
                         <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                            <label className="block text-sm font-bold text-yellow-500 mb-4 uppercase tracking-wide">Dynamic Pricing Setup</label>
+                            <label className="block text-sm font-bold text-yellow-500 mb-4 uppercase tracking-wide">Seat Pricing & Layout</label>
 
-                            <div className="mb-4">
-                                <label className="text-sm text-gray-400 mb-1 block">Base Ticket Price (INR)</label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">₹</span>
-                                    <input
-                                        type="number"
-                                        placeholder="e.g. 200"
-                                        className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl pl-8 pr-4 py-3 text-white focus:outline-none focus:border-yellow-500 font-mono text-lg font-bold"
-                                        value={formData.basePrice}
-                                        onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
-                                        required
-                                        min="0"
-                                    />
+                            <div className="grid grid-cols-1 gap-4 mb-4">
+                                {/* Normal */}
+                                <div className="flex items-center gap-4 bg-[#0a0a0a] p-3 rounded-xl border border-white/5">
+                                    <div className="w-24">
+                                        <span className="block text-gray-400 text-xs uppercase font-bold">Standard</span>
+                                        <span className="text-gray-600 text-[10px]">{SEAT_COUNTS.NORMAL} seats</span>
+                                    </div>
+                                    <div className="relative flex-1">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">₹</span>
+                                        <input
+                                            type="number"
+                                            placeholder="Price"
+                                            className="w-full bg-transparent border-none text-white focus:ring-0 pl-8 font-mono font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                            value={formData.priceNormal}
+                                            onChange={(e) => setFormData({ ...formData, priceNormal: e.target.value })}
+                                            required
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Prime */}
+                                <div className="flex items-center gap-4 bg-[#0a0a0a] p-3 rounded-xl border border-white/5">
+                                    <div className="w-24">
+                                        <span className="block text-purple-400 text-xs uppercase font-bold">Prime</span>
+                                        <span className="text-gray-600 text-[10px]">{SEAT_COUNTS.PRIME} seats</span>
+                                    </div>
+                                    <div className="relative flex-1">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">₹</span>
+                                        <input
+                                            type="number"
+                                            placeholder="Price"
+                                            className="w-full bg-transparent border-none text-white focus:ring-0 pl-8 font-mono font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                            value={formData.pricePrime}
+                                            onChange={(e) => setFormData({ ...formData, pricePrime: e.target.value })}
+                                            required
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Recliner */}
+                                <div className="flex items-center gap-4 bg-[#0a0a0a] p-3 rounded-xl border border-white/5">
+                                    <div className="w-24">
+                                        <span className="block text-yellow-400 text-xs uppercase font-bold">Recliner</span>
+                                        <span className="text-gray-600 text-[10px]">{SEAT_COUNTS.RECLINER} seats</span>
+                                    </div>
+                                    <div className="relative flex-1">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">₹</span>
+                                        <input
+                                            type="number"
+                                            placeholder="Price"
+                                            className="w-full bg-transparent border-none text-white focus:ring-0 pl-8 font-mono font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                            value={formData.priceRecliner}
+                                            onChange={(e) => setFormData({ ...formData, priceRecliner: e.target.value })}
+                                            required
+                                            min="0"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Pricing Preview Table */}
+                            {/* Total Estimation */}
                             {pricingPreview && (
-                                <div className="mt-4 overflow-hidden rounded-lg border border-white/10">
-                                    <table className="w-full text-sm text-left">
-                                        <thead className="bg-white/5 text-gray-400 font-bold uppercase text-xs">
-                                            <tr>
-                                                <th className="px-4 py-2">Tier</th>
-                                                <th className="px-4 py-2">Multiplier</th>
-                                                <th className="px-4 py-2 text-right">Final Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-white/5">
-                                            <tr>
-                                                <td className="px-4 py-2 text-gray-300">Normal</td>
-                                                <td className="px-4 py-2 text-gray-500">1.0x</td>
-                                                <td className="px-4 py-2 text-right font-mono font-bold text-white">₹{pricingPreview.NORMAL.toFixed(0)}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="px-4 py-2 text-purple-400">Prime</td>
-                                                <td className="px-4 py-2 text-gray-500">1.5x</td>
-                                                <td className="px-4 py-2 text-right font-mono font-bold text-white">₹{pricingPreview.PRIME.toFixed(0)}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="px-4 py-2 text-yellow-400">Recliner</td>
-                                                <td className="px-4 py-2 text-gray-500">3.0x</td>
-                                                <td className="px-4 py-2 text-right font-mono font-bold text-white">₹{pricingPreview.RECLINER.toFixed(0)}</td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot className="bg-green-500/10 border-t border-green-500/20">
-                                            <tr>
-                                                <td colSpan="2" className="px-4 py-2 text-green-400 font-bold">Est. Revenue (Full House)</td>
-                                                <td className="px-4 py-2 text-right font-mono font-bold text-green-400">₹{pricingPreview.totalPotential.toLocaleString()}</td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                                <div className="flex justify-between items-center pt-4 border-t border-white/10">
+                                    <span className="text-sm font-bold text-gray-400">Est. Total Revenue (Full House)</span>
+                                    <span className="text-xl font-mono font-bold text-green-400">₹{pricingPreview.totalPotential.toLocaleString()}</span>
                                 </div>
                             )}
                         </div>

@@ -12,16 +12,41 @@ const SEAT_TYPE_LABELS = {
     RECLINER: 'Recliner',
 };
 
-const SeatLayout = ({ layout = [], readOnly = true }) => {
-    // Default static layout if none provided
-    const seatLayout = layout.length > 0 ? layout : [
+const LAYOUT_CONFIGS = {
+    'Small': [
+        { row: 'A', seats: Array(10).fill({ type: 'NORMAL', status: 'AVAILABLE' }) },
+        { row: 'B', seats: Array(12).fill({ type: 'NORMAL', status: 'AVAILABLE' }) },
+        { row: 'C', seats: Array(14).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
+        { row: 'D', seats: Array(14).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
+        { row: 'E', seats: Array(10).fill({ type: 'RECLINER', status: 'AVAILABLE' }) },
+    ], // Approx 60-70 seats (Visual representation)
+    'Medium': [
         { row: 'A', seats: Array(15).fill({ type: 'NORMAL', status: 'AVAILABLE' }) },
         { row: 'B', seats: Array(15).fill({ type: 'NORMAL', status: 'AVAILABLE' }) },
         { row: 'C', seats: Array(15).fill({ type: 'NORMAL', status: 'AVAILABLE' }) },
         { row: 'D', seats: Array(15).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
         { row: 'E', seats: Array(15).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
-        { row: 'F', seats: Array(12).fill({ type: 'RECLINER', status: 'AVAILABLE' }) }, // Fewer seats for Recliners
-    ];
+        { row: 'F', seats: Array(15).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
+        { row: 'G', seats: Array(12).fill({ type: 'RECLINER', status: 'AVAILABLE' }) },
+    ], // Approx 100+ seats
+    'Large': [
+        { row: 'A', seats: Array(20).fill({ type: 'NORMAL', status: 'AVAILABLE' }) },
+        { row: 'B', seats: Array(20).fill({ type: 'NORMAL', status: 'AVAILABLE' }) },
+        { row: 'C', seats: Array(20).fill({ type: 'NORMAL', status: 'AVAILABLE' }) },
+        { row: 'D', seats: Array(20).fill({ type: 'NORMAL', status: 'AVAILABLE' }) },
+        { row: 'E', seats: Array(20).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
+        { row: 'F', seats: Array(20).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
+        { row: 'G', seats: Array(20).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
+        { row: 'H', seats: Array(20).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
+        { row: 'I', seats: Array(20).fill({ type: 'PRIME', status: 'AVAILABLE' }) },
+        { row: 'J', seats: Array(15).fill({ type: 'RECLINER', status: 'AVAILABLE' }) },
+        { row: 'K', seats: Array(15).fill({ type: 'RECLINER', status: 'AVAILABLE' }) },
+    ] // Approx 200+ seats
+};
+
+const SeatLayout = ({ layout = [], size = 'Medium', readOnly = true }) => {
+    // Select layout based on size prop if explicit layout not provided
+    const seatLayout = layout.length > 0 ? layout : (LAYOUT_CONFIGS[size] || LAYOUT_CONFIGS['Medium']);
 
     return (
         <div className="w-full bg-[#0a0a0a] p-6 rounded-2xl overflow-x-auto border border-white/10">
