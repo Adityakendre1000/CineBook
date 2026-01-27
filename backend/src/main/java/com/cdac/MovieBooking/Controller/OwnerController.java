@@ -2,25 +2,26 @@ package com.cdac.MovieBooking.Controller;
 
 import com.cdac.MovieBooking.Dtos.Request.AddScreenRequestDTO;
 import com.cdac.MovieBooking.Dtos.Request.AddTheatereRequestDTO;
+import com.cdac.MovieBooking.Dtos.Request.SeatRequestDTO;
 import com.cdac.MovieBooking.Dtos.Response.ApiResponse;
+import com.cdac.MovieBooking.Dtos.Response.SeatResponseDTO;
 import com.cdac.MovieBooking.Entities.Screen;
 import com.cdac.MovieBooking.Entities.Theatre;
 import com.cdac.MovieBooking.Entities.User;
 import com.cdac.MovieBooking.Repository.UserRepository;
 import com.cdac.MovieBooking.Security.CustomUserDetails;
 import com.cdac.MovieBooking.Service.OwnerService;
+import com.cdac.MovieBooking.Service.SeatService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/owner") 
@@ -63,6 +64,24 @@ public class OwnerController {
         Screen screen = ownerService.addScreen(request, ownerId);
         return ResponseEntity.ok(screen);
     }
+
+
+
+    private final SeatService seatService;
+
+    @PostMapping("/screens/{screenId}/seats")
+    public ResponseEntity<ApiResponse<List<SeatResponseDTO>>> createSeats(
+            @PathVariable Long screenId,
+            @RequestBody List<SeatRequestDTO> seatRequestDTOs) {
+
+        List<SeatResponseDTO> seats = seatService.createSeats(screenId, seatRequestDTOs);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Seats created successfully", seats)
+        );
+    }
+
+
 
 
 }
