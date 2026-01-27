@@ -12,6 +12,8 @@ import TheaterSelectionPage from "./pages/TheaterSelectionPage";
 import TheaterOwnerView from "./pages/TheatereOwnerView";
 import SuperAdminView from "./pages/SuperAdminView";
 import MyBookings from "./pages/MyBookings";
+import MovieSeats from "./components/movie/MovieSeats";
+import SeatSelectionPage from "./pages/SeatSelectionPage";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { ToastProvider } from "./context/ToastContext";
@@ -34,18 +36,22 @@ const App = () => {
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/terms-and-services" element={<TermsAndServices />} />
             <Route path="/movie/:id" element={<MovieDetailPage />} />
+            <Route path='/movie/seats/:theaterId/:movieId' element={<SeatSelectionPage />} />
 
             {/* USER ROUTES */}
             <Route element={<ProtectedRoute allowedRoles={["ROLE_USER"]} />}>
               <Route path="/userview" element={<UserView />} />
               <Route path="/my-bookings" element={<MyBookings />} />
               <Route path="/book/:id" element={<TheaterSelectionPage />} />
+
             </Route>
 
             {/* THEATER OWNER ROUTES */}
             <Route element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]} />}>
               <Route path="/theaterowner" element={<TheaterOwnerView />} />
             </Route>
+
+
 
             {/* SUPER ADMIN ROUTES */}
             <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>

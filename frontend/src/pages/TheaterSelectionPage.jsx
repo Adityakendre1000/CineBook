@@ -15,13 +15,13 @@ const TheaterSelectionPage = () => {
     const getNext3Days = () => {
         const dates = [];
         for (let i = 0; i < 3; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() + i);
-        dates.push({
-            full: d.toISOString().split('T')[0],
-            day: d.toLocaleDateString('en-US', { weekday: 'short' }),
-            date: d.getDate(),
-        });
+            const d = new Date();
+            d.setDate(d.getDate() + i);
+            dates.push({
+                full: d.toISOString().split('T')[0],
+                day: d.toLocaleDateString('en-US', { weekday: 'short' }),
+                date: d.getDate(),
+            });
         }
         return dates;
     };
@@ -64,7 +64,7 @@ const TheaterSelectionPage = () => {
     const getFilteredTheaters = () => {
         if (!shows.length) return [];
 
-        const filteredShows = shows.filter(show => 
+        const filteredShows = shows.filter(show =>
             show.showTime.startsWith(selectedDate)
         );
 
@@ -92,7 +92,11 @@ const TheaterSelectionPage = () => {
     const handleBack = () => {
         navigate(-1);
     }
-    const handleTimeSelect = (theater, time) => console.log(`Selected ${theater.name} at ${time}`);
+    const handleTimeSelect = (theater, time) => {
+        // Construct the URL with query parameters
+        const url = `/movie/seats/${theater.id}/${movie.id}?date=${selectedDate}&time=${time}&theaterName=${encodeURIComponent(theater.name)}&price=15`;
+        navigate(url);
+    };
 
     if (loading) return <div className="min-h-screen bg-[#1a1a1a] text-white flex items-center justify-center">Loading...</div>;
     if (error) return <div className="min-h-screen bg-[#1a1a1a] text-white flex items-center justify-center">{error}</div>;
