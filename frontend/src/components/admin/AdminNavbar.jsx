@@ -21,7 +21,7 @@ const AdminNavbar = () => {
     const isActive = (path) => location.pathname === path;
 
     const navItems = [
-        { path: "/superadmin", label: "Dashboard", icon: LayoutDashboard },
+        { path: "/superadmin/dashboard", label: "Dashboard", icon: LayoutDashboard },
         { path: "/superadmin/users", label: "Users", icon: Users },
         { path: "/superadmin/movies", label: "Movies", icon: Film },
         { path: "/superadmin/approvals", label: "Approvals", icon: ClipboardList },

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Users, Building2, Ticket, TrendingUp } from 'lucide-react';
+import { Users, Building2, Ticket, TrendingUp, MapPin, Calendar, Star, Layout } from 'lucide-react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { MOCK_THEATERS, MOCK_REQUESTS, MOCK_REVENUE_DATA, MOCK_GENRE_DATA } from '../../data/mockData';
+import { MOCK_THEATERS, MOCK_REQUESTS, MOCK_REVENUE_DATA, MOCK_GENRE_DATA, MOCK_MOVIES } from '../../data/mockData';
 
 const AdminDashboard = () => {
     // Stats for cards
@@ -16,6 +16,8 @@ const AdminDashboard = () => {
     ];
 
     const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
+    const pendingRequests = MOCK_REQUESTS.slice(0, 3); // Show top 3 recent
+    const topMovies = [...MOCK_MOVIES].sort((a,b) => b.rating - a.rating).slice(0, 3);
 
     return (
         <div className="space-y-8 animate-fade-in">
@@ -96,6 +98,65 @@ const AdminDashboard = () => {
                                 <Legend verticalAlign="bottom" height={36} wrapperStyle={{paddingTop: '20px'}} />
                             </PieChart>
                         </ResponsiveContainer>
+                    </div>
+                </div>
+            </div>
+
+            {/* Recent Activity & Top Movies Lists */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                 {/* Recent Registrations */}
+                 <div className="bg-[#1e1e1e] rounded-xl border border-white/5 p-6 shadow-xl">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-bold text-lg">Recent Registration Requests</h3>
+                    </div>
+                    <div className="space-y-4">
+                        {pendingRequests.map((req) => (
+                            <div key={req.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/5">
+                                <div className="flex items-center gap-3">
+                                    <div className={`p-2 rounded-lg ${
+                                        req.status === 'Pending' ? 'bg-orange-500/10 text-orange-500' : 
+                                        req.status === 'Active' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+                                    }`}>
+                                        <Building2 size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium text-white">{req.name}</h4>
+                                        <div className="flex items-center gap-3 text-xs text-gray-400 mt-1">
+                                            <span className="flex items-center gap-1"><MapPin size={12}/> {req.location}</span>
+                                            <span className="flex items-center gap-1"><Calendar size={12}/> {req.date}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span className={`text-xs font-bold px-2 py-1 rounded-full border ${
+                                     req.status === 'Pending' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 
+                                     req.status === 'Active' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'
+                                }`}>
+                                    {req.status}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Top Performing Movies */}
+                <div className="bg-[#1e1e1e] rounded-xl border border-white/5 p-6 shadow-xl">
+                     <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-bold text-lg">Top Performing Movies</h3>
+                    </div>
+                    <div className="space-y-4">
+                         {topMovies.map((movie, index) => (
+                             <div key={movie.id} className="flex items-center gap-4 p-3 hover:bg-white/5 rounded-lg transition-colors">
+                                 <div className="font-bold text-gray-500 w-6 text-center">{index + 1}</div>
+                                 <img src={movie.image} alt={movie.title} className="w-12 h-16 object-cover rounded shadow-sm" />
+                                 <div className="flex-1">
+                                     <h4 className="font-medium text-white">{movie.title}</h4>
+                                     <p className="text-xs text-gray-400 mt-0.5">{movie.genre}</p>
+                                 </div>
+                                 <div className="flex items-center gap-1 text-yellow-500 font-bold bg-yellow-500/10 px-2 py-1 rounded text-sm">
+                                     <Star size={14} fill="currentColor" /> {movie.rating}
+                                 </div>
+                             </div>
+                         ))}
                     </div>
                 </div>
             </div>
