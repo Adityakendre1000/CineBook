@@ -9,29 +9,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse<Object>> handleRuntime(
-            RuntimeException ex
-    ) {
-        return ResponseEntity.badRequest()
-                .body(ApiResponse.error("Registration failed", ex.getMessage()));
-    }
+        @ExceptionHandler(RuntimeException.class)
+        public ResponseEntity<ApiResponse<Object>> handleRuntime(
+                        RuntimeException ex) {
+                return ResponseEntity.badRequest()
+                                .body(ApiResponse.error("Registration failed", ex.getMessage()));
+        }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(
-            ResourceNotFoundException ex) {
+        @ExceptionHandler(ResourceNotFoundException.class)
+        public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(
+                        ResourceNotFoundException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error("Resource not found", ex.getMessage()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(ApiResponse.error("Resource not found", ex.getMessage()));
+        }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleGeneralException(
-            Exception ex) {
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ApiResponse<Void>> handleGeneralException(
+                        Exception ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("Something went wrong", ex.getMessage()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(ApiResponse.error("Something went wrong", ex.getMessage()));
+        }
 }

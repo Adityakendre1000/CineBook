@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { MOCK_MOVIES, MOCK_THEATERS } from '../data/mockData';
+import { getAllMovies } from '../services/movieService';
 
 const GENRES = ['Action', 'Comedy', 'Drama', 'Horror', 'Romance']; // Add your genres here
 
@@ -9,11 +8,33 @@ const CustomerView = () => {
     const [selectedGenre, setSelectedGenre] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [movies, setMovies] = useState([]);
 
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const fetchMovies = async () => {
+            try {
+                const response = await getAllMovies();
+                if (response && response.data) {
+                    const mappedMovies = response.data.map((movie) => ({
+                        id: movie.movieId,
+                        title: movie.title,
+                        genre: movie.genre || 'Generic',
+                        desc: movie.description,
+                        image: movie.posterUrl || 'https://via.placeholder.com/300x450',
+                    }));
+                    setMovies(mappedMovies);
+                }
+            } catch (error) {
+                console.error("Failed to fetch movies:", error);
+            }
+        };
+        fetchMovies();
+    }, []);
 
-    const filteredMovies = MOCK_MOVIES.filter((movie) => {
+
+    const filteredMovies = movies.filter((movie) => {
         const matchesGenre = selectedGenre === 'All' || movie.genre.includes(selectedGenre);
         const matchesSearch = movie.title.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesGenre && matchesSearch;

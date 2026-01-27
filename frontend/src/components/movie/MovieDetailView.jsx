@@ -17,14 +17,11 @@ const MovieDetailView = ({ movie, onBack, onBookTicket }) => {
                         <ChevronLeft size={20} className="mr-1" /> Back
                     </button>
 
-                    <iframe
-                        className="w-full h-full object-cover"
-                        src={`https://www.youtube.com/embed/${movie.trailerId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${movie.trailerId}`}
-                        title="YouTube video player"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                    ></iframe>
+                    <img
+                        src={movie.image}
+                        alt={movie.title}
+                        className="w-full h-full object-cover opacity-60"
+                    />
 
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent pointer-events-none"></div>
                 </div>

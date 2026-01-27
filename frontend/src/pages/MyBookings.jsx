@@ -1,8 +1,45 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, Ticket } from 'lucide-react';
+import { getUserBookings } from '../services/userService';
 
-const MyBookings = ({ bookings = [] }) => {
+const MyBookings = () => {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await getUserBookings();
+        if (response && response.data) {
+          const mappedBookings = response.data.map((booking) => ({
+            id: booking.bookingId,
+            movieTitle: booking.movieTitle,
+            movieGenre: booking.genre,
+            movieImage: booking.posterUrl || 'https://via.placeholder.com/300x450',
+            date: new Date(booking.showTime).toLocaleDateString(),
+            time: new Date(booking.showTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            theaterName: booking.theatreName,
+            seats: ['General'], // Placeholder as backend doesn't provide seats yet
+            total: booking.totalAmount,
+          }));
+          setBookings(mappedBookings);
+        }
+      } catch (err) {
+        console.error("Failed to fetch bookings:", err);
+        const errorMessage = err.response?.data?.message || err.message || "Failed to load your bookings.";
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, []);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
+  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;
   return (
     <div className="space-y-10">
       <header>
