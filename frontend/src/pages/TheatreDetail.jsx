@@ -42,15 +42,38 @@ const TheatreDetail = () => {
         addToast('Show scheduled successfully!', 'success');
     };
 
-    const handleAddScreen = async (newScreen) => {
-        console.log("New Screen:", newScreen);
-        const addedScreen = await ownerService.addScreen(id, newScreen);
-        // Optimistically update theatre screens
-        setTheatre({
-            ...theatre,
-            screens: [...theatre.screens, addedScreen]
-        });
-        addToast(`${newScreen.name} added successfully!`, 'success');
+    const [editingScreen, setEditingScreen] = useState(null);
+
+    const handleEditClick = (screen) => {
+        setEditingScreen(screen);
+        setIsAddScreenOpen(true);
+    };
+
+    const handleModalClose = () => {
+        setIsAddScreenOpen(false);
+        setEditingScreen(null);
+    };
+
+    const handleScreenSubmit = async (screenData) => {
+        if (editingScreen) {
+             // Mock Update Logic
+             console.log("Updating screen:", screenData);
+             setTheatre({
+                 ...theatre,
+                 screens: theatre.screens.map(s => s.id === editingScreen.id ? { ...s, ...screenData } : s)
+             });
+             addToast('Screen updated successfully', 'success');
+        } else {
+             // Create Logic
+             console.log("Adding Screen:", screenData);
+             const addedScreen = await ownerService.addScreen(id, screenData);
+             setTheatre({
+                 ...theatre,
+                 screens: [...theatre.screens, addedScreen]
+             });
+             addToast(`${screenData.name || 'Screen'} added successfully!`, 'success');
+        }
+        handleModalClose();
     };
 
     const handleDisableScreen = async (screenId) => {
@@ -70,11 +93,6 @@ const TheatreDetail = () => {
             addToast(`Screen ${newStatus === 'DISABLED' ? 'disabled' : 'enabled'} successfully`, 'success');
         }
     };
-
-
-
-
-
 
     if (loading || !theatre) {
         return <div className="text-white text-center p-10">Loading Theatre Details...</div>;
@@ -179,6 +197,13 @@ const TheatreDetail = () => {
                                         </div>
                                         <div className="flex gap-3">
                                             <button
+                                                onClick={() => handleEditClick(screen)}
+                                                className="p-2 rounded-lg hover:bg-blue-500/20 text-gray-400 hover:text-blue-500 transition-colors"
+                                                title="Edit Screen"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button
                                                 onClick={() => handleDisableScreen(screen.id)}
                                                 className={`p-2 rounded-lg transition-colors ${screen.status === 'DISABLED' ? 'hover:bg-green-500/20 text-green-500' : 'hover:bg-red-500/20 text-gray-400 hover:text-red-500'}`}
                                                 title={screen.status === 'DISABLED' ? "Enable Screen" : "Disable Screen"}
@@ -205,7 +230,8 @@ const TheatreDetail = () => {
                 {/* SHOWS TAB */}
                 {activeTab === 'shows' && (
                     <div className="space-y-6">
-                        <div className="flex justify-between items-center bg-[#1e1e1e] p-4 rounded-xl border border-white/10">
+                        {/* ... existing shows tab content ... */}
+                         <div className="flex justify-between items-center bg-[#1e1e1e] p-4 rounded-xl border border-white/10">
                             <h3 className="font-bold text-lg text-white px-2">Today's Schedule</h3>
                             <button
                                 onClick={() => setIsAddShowOpen(true)}
@@ -259,8 +285,9 @@ const TheatreDetail = () => {
 
             <AddScreenModal
                 isOpen={isAddScreenOpen}
-                onClose={() => setIsAddScreenOpen(false)}
-                onSubmit={handleAddScreen}
+                onClose={handleModalClose}
+                onSubmit={handleScreenSubmit}
+                initialData={editingScreen}
             />
         </div>
     );

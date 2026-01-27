@@ -11,13 +11,18 @@ public class AddScreenRequestDTO {
     @NotNull(message = "theatre ID is required")
     private Long theatreId;
 
-    @NotNull
-    @Min(value=1,message = "Screen Number is required")
-    private int screenNumber;
+    @NotNull(message = "Layout Type is required")
+    private com.cdac.MovieBooking.Entities.Enums.LayoutType layoutType;
 
-    @NotNull
-    @Min(value = 1,message="Total seats are required")
-    private int totalSeats;
+    // Map of Row Name (e.g., "A", "A-D") to SeatType (NORMAL, PRIME, RECLINER)
+    private java.util.Map<String, String> rowConfig;
 
+    // Total seats will be calculated backend side, but we can keep it for
+    // validation if needed,
+    // or better remove it if we strictly generate.
+    // The user prompt said: "screen number... set to auto-increment".
+    // We'll keep totalSeats as an output or calculated field, but for input it's
+    // derived from layout.
+    // However, the current FE sends it. Let's keep it optional or ignore it.
 
 }
