@@ -39,10 +39,21 @@ const ownerService = {
                 return {
                     ...mockTheatre,
                     description: "Premium cinema experience with 4K projection and Dolby Atmos. (Mock Description)",
-                    // screens: mockTheatre.screens // Use the screens from the mock object
                 };
             }
-            return null;
+
+            // Fallback for newly created (client-side only) theatres
+            return {
+                id: parseInt(id),
+                name: "New Demo Theatre",
+                location: "Mock Location",
+                city: "Mumbai",
+                screens: [],
+                status: "OPEN",
+                rating: 0,
+                description: "This is a newly created theatre (mock data persistence only).",
+                image: "https://images.unsplash.com/photo-1517604931442-71053e3e2c3c?auto=format&fit=crop&q=80&w=800"
+            };
         }
     },
 

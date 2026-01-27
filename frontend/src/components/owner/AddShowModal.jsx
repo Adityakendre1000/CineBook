@@ -8,7 +8,7 @@ const SEAT_COUNTS = {
     RECLINER: 12 // Row F (1 * 12)
 };
 
-const AddShowModal = ({ isOpen, onClose, theatreName, onSubmit }) => {
+const AddShowModal = ({ isOpen, onClose, theatreName, onSubmit, screens = [] }) => {
     const [formData, setFormData] = useState({
         movieId: '',
         screenId: '',
@@ -109,9 +109,11 @@ const AddShowModal = ({ isOpen, onClose, theatreName, onSubmit }) => {
                                     required
                                 >
                                     <option value="">Select...</option>
-                                    <option value="1">Screen 1 (Standard)</option>
-                                    <option value="2">Screen 2 (IMAX)</option>
-                                    <option value="3">Screen 3 (Gold)</option>
+                                    {screens.map(screen => (
+                                        <option key={screen.id} value={screen.id}>
+                                            {screen.name} ({screen.type})
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div>
