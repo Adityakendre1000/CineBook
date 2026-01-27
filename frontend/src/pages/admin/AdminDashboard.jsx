@@ -1,23 +1,62 @@
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { Users, Building2, Ticket, TrendingUp, MapPin, Calendar, Star, Layout } from 'lucide-react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { MOCK_THEATERS, MOCK_REQUESTS, MOCK_REVENUE_DATA, MOCK_GENRE_DATA, MOCK_MOVIES } from '../../data/mockData';
+import { MOCK_REVENUE_DATA, MOCK_GENRE_DATA, MOCK_THEATERS } from '../../data/mockData';
+import { getDashboardStats, getPendingTheatres, getAllMovies } from '../../services/adminService';
 
 const AdminDashboard = () => {
+    const [stats, setStats] = useState({
+        totalUsers: 0,
+        activeTheaters: 0,
+        totalBookings: 0,
+        pendingRequests: 0
+    });
+    const [pendingRequests, setPendingRequests] = useState([]);
+    const [topMovies, setTopMovies] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [statsRes, requestsRes, moviesRes] = await Promise.all([
+                    getDashboardStats(),
+                    getPendingTheatres(),
+                    getAllMovies()
+                ]);
+
+                setStats(statsRes.data.data);
+                setPendingRequests(requestsRes.data.data.slice(0, 3));
+                
+                // Sort movies by rating desc and take top 3
+                const sortedMovies = [...moviesRes.data.data]
+                    .sort((a, b) => b.rating - a.rating)
+                    .slice(0, 3);
+                setTopMovies(sortedMovies);
+
+            } catch (error) {
+                console.error("Failed to fetch dashboard data", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     // Stats for cards
-    const stats = [
-        { label: "Total Users", value: "12,450", icon: Users, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-        { label: "Active Theaters", value: MOCK_THEATERS.length, icon: Building2, color: "text-green-500", bg: "bg-green-500/10", border: "border-green-500/20" },
-        { label: "Total Bookings", value: "85,200", icon: Ticket, color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/20" },
-        { label: "Pending Requests", value: MOCK_REQUESTS.filter(r => r.status === 'Pending').length, icon: TrendingUp, color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20" },
+    const statCards = [
+        { label: "Total Users", value: stats.totalUsers, icon: Users, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" },
+        { label: "Active Theaters", value: stats.activeTheaters, icon: Building2, color: "text-green-500", bg: "bg-green-500/10", border: "border-green-500/20" },
+        { label: "Total Bookings", value: stats.totalBookings, icon: Ticket, color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/20" },
+        { label: "Pending Requests", value: stats.pendingRequests, icon: TrendingUp, color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20" },
     ];
 
+
     const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
-    const pendingRequests = MOCK_REQUESTS.slice(0, 3); // Show top 3 recent
-    const topMovies = [...MOCK_MOVIES].sort((a,b) => b.rating - a.rating).slice(0, 3);
 
     return (
         <div className="space-y-8 animate-fade-in">
@@ -29,7 +68,7 @@ const AdminDashboard = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, index) => (
+                {statCards.map((stat, index) => (
                     <div key={index} className="bg-[#1e1e1e] p-6 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
                         <div className="flex justify-between items-start">
                             <div>
@@ -111,27 +150,27 @@ const AdminDashboard = () => {
                     </div>
                     <div className="space-y-4">
                         {pendingRequests.map((req) => (
-                            <div key={req.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/5">
+                            <div key={req.theatreId} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/5">
                                 <div className="flex items-center gap-3">
                                     <div className={`p-2 rounded-lg ${
-                                        req.status === 'Pending' ? 'bg-orange-500/10 text-orange-500' : 
-                                        req.status === 'Active' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+                                        req.theatreApprovalStatus === 'PENDING' ? 'bg-orange-500/10 text-orange-500' : 
+                                        req.theatreApprovalStatus === 'APPROVED' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
                                     }`}>
                                         <Building2 size={20} />
                                     </div>
                                     <div>
-                                        <h4 className="font-medium text-white">{req.name}</h4>
+                                        <h4 className="font-medium text-white">{req.theatreName}</h4>
                                         <div className="flex items-center gap-3 text-xs text-gray-400 mt-1">
                                             <span className="flex items-center gap-1"><MapPin size={12}/> {req.location}</span>
-                                            <span className="flex items-center gap-1"><Calendar size={12}/> {req.date}</span>
+                                            <span className="flex items-center gap-1"><Calendar size={12}/> {new Date(req.createdAt).toLocaleDateString()}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <span className={`text-xs font-bold px-2 py-1 rounded-full border ${
-                                     req.status === 'Pending' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 
-                                     req.status === 'Active' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'
+                                     req.theatreApprovalStatus === 'PENDING' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 
+                                     req.theatreApprovalStatus === 'APPROVED' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'
                                 }`}>
-                                    {req.status}
+                                    {req.theatreApprovalStatus}
                                 </span>
                             </div>
                         ))}
@@ -145,9 +184,9 @@ const AdminDashboard = () => {
                     </div>
                     <div className="space-y-4">
                          {topMovies.map((movie, index) => (
-                             <div key={movie.id} className="flex items-center gap-4 p-3 hover:bg-white/5 rounded-lg transition-colors">
+                             <div key={movie.movieId} className="flex items-center gap-4 p-3 hover:bg-white/5 rounded-lg transition-colors">
                                  <div className="font-bold text-gray-500 w-6 text-center">{index + 1}</div>
-                                 <img src={movie.image} alt={movie.title} className="w-12 h-16 object-cover rounded shadow-sm" />
+                                 <img src={movie.posterUrl} alt={movie.title} className="w-12 h-16 object-cover rounded shadow-sm" />
                                  <div className="flex-1">
                                      <h4 className="font-medium text-white">{movie.title}</h4>
                                      <p className="text-xs text-gray-400 mt-0.5">{movie.genre}</p>

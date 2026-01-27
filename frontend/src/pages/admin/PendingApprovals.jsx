@@ -1,20 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, X, MapPin, Building2, Calendar } from 'lucide-react';
-import { MOCK_REQUESTS } from '../../data/mockData';
 import { useToast } from '../../context/ToastContext';
+import { getPendingTheatres, approveTheatre } from '../../services/adminService';
 
 const PendingApprovals = () => {
-    const { addToast } = useToast(); // Use the custom hook wrapper
-    const [requests, setRequests] = useState(MOCK_REQUESTS.filter(r => r.status === 'Pending'));
+    const { addToast } = useToast(); 
+    const [requests, setRequests] = useState([]);
 
-    const handleStatusUpdate = (id, newStatus) => {
-        // In a real app, this would make an API call
-        setRequests(prev => prev.filter(req => req.id !== id));
-        
-        if (newStatus === 'Active') {
-            addToast('Theater registration approved successfully', 'success');
-        } else {
-            addToast('Theater registration rejected', 'info');
+    const fetchRequests = async () => {
+        try {
+            const response = await getPendingTheatres();
+            setRequests(response.data.data);
+        } catch (error) {
+            console.error("Failed to fetch pending requests", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchRequests();
+    }, []);
+
+    const handleStatusUpdate = async (id, newStatus) => {
+        try {
+            const isApproved = newStatus === 'Active';
+            await approveTheatre(id, isApproved);
+            
+            // Optimistic update or refresh
+            setRequests(prev => prev.filter(req => req.theatreId !== id));
+            
+            if (isApproved) {
+                addToast('Theater registration approved successfully', 'success');
+            } else {
+                addToast('Theater registration rejected', 'info');
+            }
+        } catch (error) {
+            console.error("Failed to update status", error);
+            addToast('Failed to update status', 'error');
         }
     };
 
@@ -34,19 +55,19 @@ const PendingApprovals = () => {
                     </div>
                 ) : (
                     requests.map((req) => (
-                        <div key={req.id} className="bg-[#1e1e1e] p-6 rounded-xl border border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-fade-in">
+                        <div key={req.theatreId} className="bg-[#1e1e1e] p-6 rounded-xl border border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-fade-in">
                             <div className="flex items-start gap-4">
                                 <div className="p-3 bg-white/5 rounded-lg border border-white/5">
                                     <Building2 size={24} className="text-blue-400" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-lg">{req.name}</h3>
+                                    <h3 className="font-bold text-lg">{req.theatreName}</h3>
                                     <div className="flex items-center gap-4 text-gray-400 text-sm mt-1">
                                         <span className="flex items-center gap-1">
                                             <MapPin size={14} /> {req.location}
                                         </span>
                                         <span className="flex items-center gap-1">
-                                            <Calendar size={14} /> {req.date}
+                                            <Calendar size={14} /> {new Date(req.createdAt).toLocaleDateString()}
                                         </span>
                                     </div>
                                 </div>
@@ -54,14 +75,14 @@ const PendingApprovals = () => {
 
                             <div className="flex items-center gap-3 w-full md:w-auto">
                                 <button 
-                                    onClick={() => handleStatusUpdate(req.id, 'Active')}
+                                    onClick={() => handleStatusUpdate(req.theatreId, 'Active')}
                                     className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
                                 >
                                     <Check size={18} />
                                     Approve
                                 </button>
                                 <button 
-                                    onClick={() => handleStatusUpdate(req.id, 'Rejected')}
+                                    onClick={() => handleStatusUpdate(req.theatreId, 'Rejected')}
                                     className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-red-600/10 hover:bg-red-600/20 text-red-500 border border-red-600/20 px-6 py-2.5 rounded-lg font-medium transition-colors"
                                 >
                                     <X size={18} />

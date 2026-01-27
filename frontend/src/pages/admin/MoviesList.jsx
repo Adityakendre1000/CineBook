@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Film, Star, Clock, Trash2, Edit } from 'lucide-react';
-import { MOCK_MOVIES } from '../../data/mockData';
+import { getAllMovies, addMovie, updateMovie, updateMovieStatus } from '../../services/adminService';
 
 const MoviesList = () => {
     const [searchTerm, setSearchTerm] = useState("");
-    const [movies, setMovies] = useState(MOCK_MOVIES);
+    const [movies, setMovies] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingId, setEditingId] = useState(null); // Track which movie is being edited
+    const [editingId, setEditingId] = useState(null); 
     
     // Form State
     const initialFormState = {
         title: "",
         genre: "",
-        duration: "",
+        durationMinutes: "",
         rating: "",
         description: "",
-        image: "",
+        posterUrl: "",
         language: "",
         releaseDate: "",
         cast: "",
@@ -25,28 +25,40 @@ const MoviesList = () => {
 
     const [formData, setFormData] = useState(initialFormState);
 
-    const handleToggleStatus = (id) => {
-        setMovies(movies.map(m => {
-            if (m.id === id) {
-                const newStatus = m.movieStatus === 'INACTIVE' ? 'ACTIVE' : 'INACTIVE';
-                return { ...m, movieStatus: newStatus };
-            }
-            return m;
-        }));
+    const fetchMovies = async () => {
+        try {
+            const response = await getAllMovies();
+            setMovies(response.data.data);
+        } catch (error) {
+            console.error("Failed to fetch movies", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchMovies();
+    }, []);
+
+    const handleToggleStatus = async (id) => {
+        try {
+            await updateMovieStatus(id);
+            fetchMovies(); // Refresh list
+        } catch (error) {
+            console.error("Failed to update status", error);
+        }
     };
 
     const handleEdit = (movie) => {
-        setEditingId(movie.id);
+        setEditingId(movie.movieId); // Endpoint uses movieId
         setFormData({
             title: movie.title || "",
             genre: movie.genre || "",
-            duration: movie.duration || "",
+            durationMinutes: movie.durationMinutes || "",
             rating: movie.rating || "",
-            description: movie.desc || movie.description || "", // handle potential naming diff in mock data
-            image: movie.image || "",
+            description: movie.description || "",
+            posterUrl: movie.posterUrl || "",
             language: movie.language || "",
             releaseDate: movie.releaseDate || "",
-            cast: movie.cast ? (Array.isArray(movie.cast) ? movie.cast.join(", ") : movie.cast) : "",
+            cast: movie.cast || "",
             crew: movie.crew || "",
             movieStatus: movie.movieStatus || "ACTIVE"
         });
@@ -64,31 +76,24 @@ const MoviesList = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        if (editingId) {
-            // Edit Mode
-            setMovies(movies.map(movie => 
-                movie.id === editingId 
-                ? { ...movie, ...formData, id: editingId } 
-                : movie
-            ));
-        } else {
-            // Add Mode
-            const newMovie = {
-                id: movies.length + 1,
-                ...formData,
-            };
-            setMovies([...movies, newMovie]);
+        try {
+            if (editingId) {
+                await updateMovie(editingId, formData);
+            } else {
+                await addMovie(formData);
+            }
+            fetchMovies();
+            handleCloseModal();
+        } catch (error) {
+            console.error("Failed to save movie", error);
         }
-
-        handleCloseModal();
     };
 
     const filteredMovies = movies.filter(movie => 
-        movie.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        movie.genre.toLowerCase().includes(searchTerm.toLowerCase())
+        (movie.title && movie.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (movie.genre && movie.genre.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
@@ -124,9 +129,9 @@ const MoviesList = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredMovies.map((movie) => (
-                    <div key={movie.id} className="bg-[#1e1e1e] rounded-xl border border-white/5 overflow-hidden group hover:border-white/20 transition-all">
+                    <div key={movie.movieId} className="bg-[#1e1e1e] rounded-xl border border-white/5 overflow-hidden group hover:border-white/20 transition-all">
                         <div className="relative h-48 overflow-hidden">
-                            <img src={movie.image || "https://via.placeholder.com/400x300?text=No+Image"} alt={movie.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                            <img src={movie.posterUrl || "https://via.placeholder.com/400x300?text=No+Image"} alt={movie.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
                             <div className="absolute top-4 right-4">
                                 <span className={`px-2 py-1 rounded text-xs font-bold ${movie.movieStatus === 'INACTIVE' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
@@ -144,7 +149,7 @@ const MoviesList = () => {
                                     <Star size={14} className="text-yellow-500" /> {movie.rating}
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <Clock size={14} /> {movie.duration}
+                                    <Clock size={14} /> {movie.durationMinutes} min
                                 </div>
                             </div>
                             
@@ -156,7 +161,7 @@ const MoviesList = () => {
                                     <Edit size={16} /> Edit
                                 </button>
                                 <button 
-                                    onClick={() => handleToggleStatus(movie.id)}
+                                    onClick={() => handleToggleStatus(movie.movieId)}
                                     className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors border ${
                                         movie.movieStatus === 'INACTIVE' 
                                         ? 'bg-green-500/10 hover:bg-green-500/20 text-green-500 border-green-500/20' 
@@ -213,13 +218,13 @@ const MoviesList = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm text-gray-400">Duration (e.g. 2h 15m)</label>
+                                    <label className="text-sm text-gray-400">Duration (in minutes)</label>
                                     <input 
-                                        type="text" 
-                                        name="duration"
+                                        type="number" 
+                                        name="durationMinutes"
                                         required
                                         className="w-full bg-[#2a2a2a] border border-white/10 rounded-lg px-4 py-2 focus:border-red-500 focus:outline-none"
-                                        value={formData.duration}
+                                        value={formData.durationMinutes}
                                         onChange={handleInputChange}
                                     />
                                 </div>
@@ -296,10 +301,10 @@ const MoviesList = () => {
                                 <label className="text-sm text-gray-400">Poster Image URL</label>
                                 <input 
                                     type="url" 
-                                    name="image"
+                                    name="posterUrl"
                                     className="w-full bg-[#2a2a2a] border border-white/10 rounded-lg px-4 py-2 focus:border-red-500 focus:outline-none"
                                     placeholder="https://..."
-                                    value={formData.image}
+                                    value={formData.posterUrl}
                                     onChange={handleInputChange}
                                 />
                             </div>
