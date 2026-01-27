@@ -59,17 +59,21 @@ export const MOCK_THEATERS = [
     id: 1,
     name: "PVR Icon: Gold Class",
     location: "Phoenix Mall, Lower Parel",
-    screens: 4,
     status: "OPEN",
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&q=80&w=800",
-    times: ["09:00 AM", "01:30 PM", "06:00 PM", "10:00 PM"]
+    times: ["09:00 AM", "01:30 PM", "06:00 PM", "10:00 PM"],
+    screens: [
+      { id: 1, name: 'Screen 1', type: 'Standard', layout: 'Medium', capacity: 180, status: 'ACTIVE' },
+      { id: 2, name: 'Screen 2', type: 'IMAX', layout: 'Large', capacity: 250, status: 'ACTIVE' },
+      { id: 3, name: 'Screen 3', type: 'PVR', layout: 'Small', capacity: 100, status: 'DISABLED' }
+    ]
   },
   {
     id: 2,
     name: "INOX: Laserplex",
     location: "Nariman Point, South Mumbai",
-    screens: 6,
+    screens: [],
     status: "RENOVATION",
     rating: 4.5,
     image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800",
@@ -79,7 +83,7 @@ export const MOCK_THEATERS = [
     id: 3,
     name: "Cinepolis: IMAX",
     location: "Fun Republic, Andheri West",
-    screens: 5,
+    screens: [],
     status: "OPEN",
     rating: 4.9,
     image: "https://images.unsplash.com/photo-1595769816263-9b910be24d5f?auto=format&fit=crop&q=80&w=800",
@@ -89,7 +93,7 @@ export const MOCK_THEATERS = [
     id: 4,
     name: "Carnival Cinemas",
     location: "Hiranandani Estate, Thane",
-    screens: 3,
+    screens: [],
     status: "CLOSED",
     rating: 4.2,
     image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=800",

@@ -53,17 +53,21 @@ const TheatreDetail = () => {
         addToast(`${newScreen.name} added successfully!`, 'success');
     };
 
-    const handleDeleteScreen = async (screenId) => {
-        if (window.confirm("Are you sure you want to delete this screen?")) {
-            const success = await ownerService.deleteScreen(screenId);
-            if (success) {
-                // Optimistically remove from state
-                setTheatre({
-                    ...theatre,
-                    screens: theatre.screens.filter(s => s.id !== screenId)
-                });
-                addToast('Screen deleted successfully', 'success');
-            }
+    const handleDisableScreen = async (screenId) => {
+        const screenToUpdate = theatre.screens.find(s => s.id === screenId);
+        // Default to ACTIVE if status is undefined
+        const currentStatus = screenToUpdate.status || 'ACTIVE';
+        const newStatus = currentStatus === 'DISABLED' ? 'ACTIVE' : 'DISABLED';
+
+        if (window.confirm(`Are you sure you want to ${newStatus === 'DISABLED' ? 'disable' : 'enable'} this screen?`)) {
+            // Optimistically update
+            setTheatre({
+                ...theatre,
+                screens: theatre.screens.map(s =>
+                    s.id === screenId ? { ...s, status: newStatus } : s
+                )
+            });
+            addToast(`Screen ${newStatus === 'DISABLED' ? 'disabled' : 'enabled'} successfully`, 'success');
         }
     };
 
@@ -160,26 +164,35 @@ const TheatreDetail = () => {
 
                         <div className="grid gap-8">
                             {theatre.screens.map((screen) => (
-                                <div key={screen.id} className="bg-[#1e1e1e] rounded-2xl border border-white/10 overflow-hidden">
+                                <div key={screen.id} className={`bg-[#1e1e1e] rounded-2xl border ${screen.status === 'DISABLED' ? 'border-red-900/30 opacity-60' : 'border-white/10'} overflow-hidden transition-all`}>
                                     <div className="p-6 bg-white/5 border-b border-white/10 flex justify-between items-center">
                                         <div>
-                                            <h3 className="text-xl font-bold text-white mb-1">{screen.name}</h3>
-                                            <div className="flex gap-3">
-                                                <button
-                                                    onClick={() => handleDeleteScreen(screen.id)}
-                                                    className="p-2 hover:bg-red-500/20 rounded-lg text-gray-400 hover:text-red-500 transition-colors"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                                            <div className="flex items-center gap-3">
+                                                <h3 className="text-xl font-bold text-white mb-1">{screen.name}</h3>
+                                                {screen.status === 'DISABLED' && (
+                                                    <span className="text-xs font-bold bg-red-500/20 text-red-500 px-2 py-0.5 rounded">DISABLED</span>
+                                                )}
                                             </div>
+                                            <span className="text-sm font-bold text-blue-400 bg-blue-400/10 px-2 py-1 rounded inline-block mt-1">
+                                                {screen.type}
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={() => handleDisableScreen(screen.id)}
+                                                className={`p-2 rounded-lg transition-colors ${screen.status === 'DISABLED' ? 'hover:bg-green-500/20 text-green-500' : 'hover:bg-red-500/20 text-gray-400 hover:text-red-500'}`}
+                                                title={screen.status === 'DISABLED' ? "Enable Screen" : "Disable Screen"}
+                                            >
+                                                <Trash2 size={18} className={screen.status === 'DISABLED' ? "rotate-45" : ""} />
+                                            </button>
                                         </div>
                                     </div>
 
                                     <div className="p-8 bg-[#0a0a0a]">
-                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-6">Seat Layout Preview</h4>
+                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-6">Seat Layout Preview ({screen.layout || 'Medium'})</h4>
                                         <div className="flex justify-center">
                                             <div className="scale-[0.8] origin-top">
-                                                <SeatLayout readOnly={true} />
+                                                <SeatLayout readOnly={true} size={screen.layout || 'Medium'} />
                                             </div>
                                         </div>
                                     </div>
@@ -241,6 +254,7 @@ const TheatreDetail = () => {
                 onClose={() => setIsAddShowOpen(false)}
                 theatreName={theatre.name}
                 onSubmit={handleAddShow}
+                screens={theatre.screens}
             />
 
             <AddScreenModal

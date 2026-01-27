@@ -2,28 +2,28 @@ import React, { useState } from 'react';
 import { X, Monitor, Users, Info } from 'lucide-react';
 
 const AddScreenModal = ({ isOpen, onClose, onSubmit }) => {
-    // Preset capacities based on type
-    const CAPACITY_PRESETS = {
-        'Standard': 150,
-        'IMAX': 240,
-        'Gold Class': 50,
-        '4DX': 100
+    // Layout capacities
+    const LAYOUT_CAPACITIES = {
+        'Small': 100,
+        'Medium': 180,
+        'Large': 250
     };
 
     const [formData, setFormData] = useState({
         name: '',
         type: 'Standard',
-        capacity: CAPACITY_PRESETS['Standard'] // Default capacity
+        layout: 'Medium',
+        capacity: 180 // Default to Medium
     });
 
     if (!isOpen) return null;
 
-    const handleTypeChange = (e) => {
-        const newType = e.target.value;
+    const handleLayoutChange = (e) => {
+        const newLayout = e.target.value;
         setFormData({
             ...formData,
-            type: newType,
-            capacity: CAPACITY_PRESETS[newType]
+            layout: newLayout,
+            capacity: LAYOUT_CAPACITIES[newLayout]
         });
     };
 
@@ -31,7 +31,12 @@ const AddScreenModal = ({ isOpen, onClose, onSubmit }) => {
         e.preventDefault();
         onSubmit(formData);
         onClose();
-        setFormData({ name: '', type: 'Standard', capacity: CAPACITY_PRESETS['Standard'] });
+        setFormData({
+            name: '',
+            type: 'Standard',
+            layout: 'Medium',
+            capacity: LAYOUT_CAPACITIES['Medium']
+        });
     };
 
     return (
@@ -60,18 +65,32 @@ const AddScreenModal = ({ isOpen, onClose, onSubmit }) => {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wide">Screen Type</label>
-                        <select
-                            className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 cursor-pointer"
-                            value={formData.type}
-                            onChange={handleTypeChange}
-                        >
-                            <option value="Standard">Standard</option>
-                            <option value="IMAX">IMAX</option>
-                            <option value="Gold Class">Gold Class</option>
-                            <option value="4DX">4DX</option>
-                        </select>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wide">Screen Type</label>
+                            <select
+                                className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+                                value={formData.type}
+                                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                            >
+                                <option value="Standard">Standard</option>
+                                <option value="IMAX">IMAX</option>
+                                <option value="INOX">INOX</option>
+                                <option value="PVR">PVR</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wide">Layout Size</label>
+                            <select
+                                className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+                                value={formData.layout}
+                                onChange={handleLayoutChange}
+                            >
+                                <option value="Small">Small (100)</option>
+                                <option value="Medium">Medium (180)</option>
+                                <option value="Large">Large (250)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
@@ -87,7 +106,7 @@ const AddScreenModal = ({ isOpen, onClose, onSubmit }) => {
                         </div>
                         <p className="text-xs text-blue-400/80 mt-2 flex items-center gap-1">
                             <Info size={12} />
-                            Capacity is fixed for {formData.type} screens.
+                            Based on {formData.layout} layout configuration.
                         </p>
                     </div>
 

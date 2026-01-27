@@ -39,14 +39,21 @@ const ownerService = {
                 return {
                     ...mockTheatre,
                     description: "Premium cinema experience with 4K projection and Dolby Atmos. (Mock Description)",
-                    screens: [
-                        { id: 1, name: "Screen 1", type: "Standard", capacity: 150 },
-                        { id: 2, name: "Screen 2", type: "IMAX", capacity: 240 },
-                        { id: 3, name: "Screen 3", type: "Gold Class", capacity: 80 },
-                    ]
                 };
             }
-            return null;
+
+            // Fallback for newly created (client-side only) theatres
+            return {
+                id: parseInt(id),
+                name: "New Demo Theatre",
+                location: "Mock Location",
+                city: "Mumbai",
+                screens: [],
+                status: "OPEN",
+                rating: 0,
+                description: "This is a newly created theatre (mock data persistence only).",
+                image: "https://images.unsplash.com/photo-1517604931442-71053e3e2c3c?auto=format&fit=crop&q=80&w=800"
+            };
         }
     },
 
