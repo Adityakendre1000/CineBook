@@ -254,6 +254,7 @@ const TheatreDetail = () => {
                 onClose={() => setIsAddShowOpen(false)}
                 theatreName={theatre.name}
                 onSubmit={handleAddShow}
+                screens={theatre.screens}
             />
 
             <AddScreenModal

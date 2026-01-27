@@ -81,7 +81,7 @@ const TheatreList = () => {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Monitor size={18} className="text-gray-500" />
-                                        {theatre.screens} Screens
+                                        {Array.isArray(theatre.screens) ? theatre.screens.length : (theatre.screens || 0)} Screens
                                     </div>
                                 </div>
                             </div>
