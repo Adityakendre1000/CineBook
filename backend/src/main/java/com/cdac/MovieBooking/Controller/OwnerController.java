@@ -1,9 +1,11 @@
 package com.cdac.MovieBooking.Controller;
 
 import com.cdac.MovieBooking.Dtos.Request.AddScreenRequestDTO;
+import com.cdac.MovieBooking.Dtos.Request.AddShowRequestDTO;
 import com.cdac.MovieBooking.Dtos.Request.AddTheatereRequestDTO;
 import com.cdac.MovieBooking.Dtos.Response.ApiResponse;
 import com.cdac.MovieBooking.Entities.Screen;
+import com.cdac.MovieBooking.Entities.Show;
 import com.cdac.MovieBooking.Entities.Theatre;
 import com.cdac.MovieBooking.Entities.User;
 import com.cdac.MovieBooking.Repository.UserRepository;
@@ -39,8 +41,7 @@ public class OwnerController {
     }
 
     @PostMapping("/add-theatre")
-    public ResponseEntity<ApiResponse<Theatre>>
-    addTheatre(@Valid @RequestBody AddTheatereRequestDTO request)
+    public ResponseEntity<ApiResponse<Theatre>> addTheatre(@Valid @RequestBody AddTheatereRequestDTO request)
     {
         //1 get logged-in in Owner's ID from his Token
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -63,6 +64,21 @@ public class OwnerController {
         Screen screen = ownerService.addScreen(request, ownerId);
         return ResponseEntity.ok(screen);
     }
+
+    @PostMapping("/add-show")
+    public ResponseEntity<ApiResponse<Show>> addShow(@RequestBody @Valid AddShowRequestDTO request, Authentication authentication) {
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Long ownerId = userDetails.getUserId();
+
+        Show show = ownerService.addShow(request, ownerId);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Show added successfully", show));
+    }
+
 
 
 }

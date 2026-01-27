@@ -1,5 +1,6 @@
 package com.cdac.MovieBooking.Entities;
 
+import com.cdac.MovieBooking.Entities.Enums.SeatType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,9 @@ public class Seat {
     private Screen screen;
 
     private String seatNumber;
-    private String seatType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SeatType seatType;
 }
 

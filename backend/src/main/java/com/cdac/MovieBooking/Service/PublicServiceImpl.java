@@ -8,10 +8,12 @@ import com.cdac.MovieBooking.Repository.MovieRepository;
 import com.cdac.MovieBooking.Repository.ShowRepository;
 import com.cdac.MovieBooking.Repository.TheatreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PublicServiceImpl implements PublicService {

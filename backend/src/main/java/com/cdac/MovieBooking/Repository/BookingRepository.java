@@ -1,12 +1,13 @@
 package com.cdac.MovieBooking.Repository;
 
 import com.cdac.MovieBooking.Entities.Booking;
+import com.cdac.MovieBooking.Entities.Enums.BookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking,Long> {
@@ -20,4 +21,9 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
         WHERE b.user.userId = :userId
     """)
     List<Booking> findAllBookingsByUserId(@Param("userId") Long userId);
+
+    Optional<Booking> findByRazorpayOrderId(String razorpayOrderId);
+
+    List<Booking> findByBookingStatus(BookingStatus bookingStatus);
+
 }
