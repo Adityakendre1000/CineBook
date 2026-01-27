@@ -10,4 +10,6 @@ public class AdminDashboardStatsDTO {
     private Long activeTheaters;
     private Long totalBookings;
     private Long pendingRequests;
+    private java.util.List<RevenueTrendDTO> revenueTrend;
+    private java.util.List<GenreOccupancyDTO> genreOccupancy;
 }

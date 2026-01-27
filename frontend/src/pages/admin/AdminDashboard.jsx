@@ -5,7 +5,6 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { MOCK_REVENUE_DATA, MOCK_GENRE_DATA, MOCK_THEATERS } from '../../data/mockData';
 import { getDashboardStats, getPendingTheatres, getAllMovies } from '../../services/adminService';
 
 const AdminDashboard = () => {
@@ -90,7 +89,7 @@ const AdminDashboard = () => {
                     <h3 className="font-bold text-lg mb-6">Revenue Trend</h3>
                     <div className="h-80 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={MOCK_REVENUE_DATA}>
+                            <AreaChart data={stats.revenueTrend || []}>
                                 <defs>
                                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
@@ -117,7 +116,7 @@ const AdminDashboard = () => {
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
-                                    data={MOCK_GENRE_DATA}
+                                    data={stats.genreOccupancy || []}
                                     cx="50%"
                                     cy="50%"
                                     innerRadius={60}
@@ -126,7 +125,7 @@ const AdminDashboard = () => {
                                     paddingAngle={5}
                                     dataKey="value"
                                 >
-                                    {MOCK_GENRE_DATA.map((entry, index) => (
+                                    {(stats.genreOccupancy || []).map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>

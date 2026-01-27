@@ -16,8 +16,14 @@ import com.cdac.MovieBooking.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import com.cdac.MovieBooking.Dtos.Response.RevenueTrendDTO;
+import com.cdac.MovieBooking.Dtos.Response.GenreOccupancyDTO;
+import com.cdac.MovieBooking.Entities.Booking;
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +36,30 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public AdminDashboardStatsDTO getDashboardStats() {
+        // Calculate Revenue Trend (Last 7 days or simply existing data grouped by date)
+        List<Booking> allBookings = bookingRepository.findAll();
+
+        Map<String, BigDecimal> revenueMap = allBookings.stream()
+                .collect(Collectors.groupingBy(
+                        b -> b.getBookingTime().format(DateTimeFormatter.ofPattern("MMM dd")),
+                        Collectors.mapping(Booking::getTotalAmount,
+                                Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
+
+        List<RevenueTrendDTO> revenueTrend = revenueMap.entrySet().stream()
+                .map(e -> new RevenueTrendDTO(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
+
+        // Calculate Genre Occupancy
+        Map<String, Long> genreMap = allBookings.stream()
+                .filter(b -> b.getShow() != null && b.getShow().getMovie() != null)
+                .collect(Collectors.groupingBy(
+                        b -> b.getShow().getMovie().getGenre(),
+                        Collectors.counting()));
+
+        List<GenreOccupancyDTO> genreOccupancy = genreMap.entrySet().stream()
+                .map(e -> new GenreOccupancyDTO(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
+
         return AdminDashboardStatsDTO.builder()
                 .totalUsers(userRepository.count())
                 .activeTheaters(theatreRepository.findAll().stream()
@@ -37,6 +67,8 @@ public class AdminServiceImpl implements AdminService {
                 .totalBookings(bookingRepository.count())
                 .pendingRequests(theatreRepository.findAll().stream()
                         .filter(t -> t.getTheatreApprovalStatus() == TheatreApprovalStatus.PENDING).count())
+                .revenueTrend(revenueTrend)
+                .genreOccupancy(genreOccupancy)
                 .build();
     }
 
