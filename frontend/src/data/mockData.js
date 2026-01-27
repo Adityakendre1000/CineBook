@@ -80,5 +80,31 @@ export const MOCK_REQUESTS = [
   { id: 4, name: "Metro Cinema", location: "Chicago, IL", status: "Rejected", date: "2024-03-01" },
 ];
 
+
+export const MOCK_USERS = [
+  { id: 1, name: "Alice Johnson", email: "alice@example.com", role: "ROLE_USER", status: "Active", joinDate: "2024-01-15" },
+  { id: 2, name: "Bob Smith", email: "bob@example.com", role: "ROLE_OWNER", status: "Active", joinDate: "2024-02-01" },
+  { id: 3, name: "Charlie Brown", email: "charlie@example.com", role: "ROLE_USER", status: "Banned", joinDate: "2024-02-10" },
+  { id: 4, name: "Diana Prince", email: "diana@example.com", role: "ROLE_ADMIN", status: "Active", joinDate: "2023-12-01" },
+  { id: 5, name: "Ethan Hunt", email: "ethan@example.com", role: "ROLE_USER", status: "Active", joinDate: "2024-03-05" },
+];
+
+export const MOCK_REVENUE_DATA = [
+  { name: 'Mon', revenue: 4000 },
+  { name: 'Tue', revenue: 3000 },
+  { name: 'Wed', revenue: 2000 },
+  { name: 'Thu', revenue: 2780 },
+  { name: 'Fri', revenue: 1890 },
+  { name: 'Sat', revenue: 2390 },
+  { name: 'Sun', revenue: 3490 },
+];
+
+export const MOCK_GENRE_DATA = [
+  { name: 'Action', value: 400 },
+  { name: 'Sci-Fi', value: 300 },
+  { name: 'Drama', value: 300 },
+  { name: 'Thriller', value: 200 },
+];
+
 export const GENRES = ['All', 'Action', 'Sci-Fi', 'Drama', 'Thriller', 'Adventure'];
 export const TICKET_PRICE = 12;

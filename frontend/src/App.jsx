@@ -10,21 +10,40 @@ import MovieDetailPage from "./pages/MovieDetailPage";
 import TermsAndServices from "./pages/TermsAndServices";
 import TheaterSelectionPage from "./pages/TheaterSelectionPage";
 import TheaterOwnerView from "./pages/TheatereOwnerView";
-import SuperAdminView from "./pages/SuperAdminView";
 import MyBookings from "./pages/MyBookings";
 
+// Admin Pages
+
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import PendingApprovals from "./pages/admin/PendingApprovals";
+import TheatreOwners from "./pages/admin/TheatreOwners";
+import UsersList from "./pages/admin/UsersList";
+import MoviesList from "./pages/admin/MoviesList";
+
+import AdminLayout from "./layouts/AdminLayout";
+import MainLayout from "./layouts/MainLayout";
+
 import ProtectedRoute from "./routes/ProtectedRoute";
+
 import { ToastProvider } from "./context/ToastContext";
-import Navbar from "./components/navbar/Navbar";
 
 const App = () => {
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white">
-      <Navbar />
+    <ToastProvider>
+      <Routes>
+        {/* SUPER ADMIN ROUTES */}
+        <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/superadmin" element={<AdminDashboard />} />
+            <Route path="/superadmin/users" element={<UsersList />} />
+            <Route path="/superadmin/movies" element={<MoviesList />} />
+            <Route path="/superadmin/approvals" element={<PendingApprovals />} />
+            <Route path="/superadmin/owners" element={<TheatreOwners />} />
+          </Route>
+        </Route>
 
-      <div className="max-w-6xl mx-auto px-4 pt-6">
-        <ToastProvider>
-          <Routes>
+        {/* MAIN APP ROUTES */}
+        <Route element={<MainLayout />}>
             {/* DEFAULT */}
             <Route path="/" element={<Navigate to="/login" replace />} />
 
@@ -47,17 +66,11 @@ const App = () => {
               <Route path="/theaterowner" element={<TheaterOwnerView />} />
             </Route>
 
-            {/* SUPER ADMIN ROUTES */}
-            <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
-              <Route path="/superadmin" element={<SuperAdminView />} />
-            </Route>
-
             {/* FALLBACK */}
             <Route path="*" element={<ErrorPage />} />
-          </Routes>
-        </ToastProvider>
-      </div>
-    </div>
+        </Route>
+      </Routes>
+    </ToastProvider>
   );
 };
 
