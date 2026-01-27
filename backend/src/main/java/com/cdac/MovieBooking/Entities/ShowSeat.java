@@ -4,6 +4,7 @@ import com.cdac.MovieBooking.Entities.Enums.ShowSeatStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,6 +30,9 @@ public class ShowSeat {
     @JoinColumn(name = "seat_id", nullable = false)
     private Seat seat;
 
+    @Column(nullable = false)
+    private BigDecimal price;
+
     @Enumerated(EnumType.STRING)
     private ShowSeatStatus showSeatStatus;
 
@@ -37,6 +41,4 @@ public class ShowSeat {
     private User lockedByUser;
 
     private LocalDateTime lockTime;
-
 }
-

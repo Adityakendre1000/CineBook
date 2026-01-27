@@ -20,7 +20,7 @@ public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long PayementId;
+    private Long PaymentId;
 
     @ManyToOne
     @JoinColumn(name = "booking_id", nullable = false)

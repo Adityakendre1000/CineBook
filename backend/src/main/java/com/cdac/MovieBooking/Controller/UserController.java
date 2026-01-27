@@ -1,10 +1,13 @@
 package com.cdac.MovieBooking.Controller;
 
+import com.cdac.MovieBooking.Dtos.Request.PaymentFailureRequest;
+import com.cdac.MovieBooking.Dtos.Request.PaymentVerifyRequest;
 import com.cdac.MovieBooking.Dtos.Request.UserUpdateRequest;
 import com.cdac.MovieBooking.Dtos.Response.ApiResponse;
 import com.cdac.MovieBooking.Dtos.Response.BookingResponse;
 import com.cdac.MovieBooking.Dtos.Response.UserResponseDto;
 import com.cdac.MovieBooking.Security.CustomUserDetails;
+import com.cdac.MovieBooking.Service.PaymentService;
 import com.cdac.MovieBooking.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService us;
+    private final PaymentService paymentService;
 
     // get user details by email
     @GetMapping("/by-email")
@@ -82,4 +86,42 @@ public class UserController {
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success("Bookings fetched successfully", bookings));
     }
+
+    @PostMapping("/payments/verify")
+    public ResponseEntity<ApiResponse<String>> verifyPayment(@RequestBody PaymentVerifyRequest request, Authentication authentication) {
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Long userId = userDetails.getUserId();
+
+        paymentService.verifyPayment(request, userId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(
+                        "Payment verified successfully",
+                        "BOOKING_CONFIRMED"
+                ));
+    }
+
+
+    @PostMapping("/payments/failure")
+    public ResponseEntity<ApiResponse<String>> paymentFailure(@RequestBody PaymentFailureRequest request, Authentication authentication) {
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        paymentService.handlePaymentFailure(
+                request,
+                userDetails.getUserId()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(
+                        "Payment failed, seats released",
+                        "BOOKING_CANCELLED"
+                ));
+    }
+
+
 }
