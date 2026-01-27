@@ -9,7 +9,9 @@ import UserView from "./pages/UserView";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import TermsAndServices from "./pages/TermsAndServices";
 import TheaterSelectionPage from "./pages/TheaterSelectionPage";
-import TheaterOwnerView from "./pages/TheatereOwnerView";
+import OwnerDashboard from "./pages/OwnerDashboard";
+import TheatreList from "./pages/TheatreList";
+import TheatreDetail from "./pages/TheatreDetail";
 import SuperAdminView from "./pages/SuperAdminView";
 import MyBookings from "./pages/MyBookings";
 import MovieSeats from "./components/movie/MovieSeats";
@@ -48,7 +50,11 @@ const App = () => {
 
             {/* THEATER OWNER ROUTES */}
             <Route element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]} />}>
-              <Route path="/theaterowner" element={<TheaterOwnerView />} />
+              <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+              <Route path="/owner/theatres" element={<TheatreList />} />
+              <Route path="/owner/theatres/:id" element={<TheatreDetail />} />
+              {/* Redirect old route /theaterowner to new dashboard */}
+              <Route path="/theaterowner" element={<Navigate to="/owner/dashboard" replace />} />
             </Route>
 
 
