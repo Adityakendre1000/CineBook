@@ -28,7 +28,8 @@ const MyBookings = () => {
         }
       } catch (err) {
         console.error("Failed to fetch bookings:", err);
-        setError("Failed to load your bookings.");
+        const errorMessage = err.response?.data?.message || err.message || "Failed to load your bookings.";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

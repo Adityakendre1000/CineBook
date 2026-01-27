@@ -33,8 +33,7 @@ public class UserController {
                 .body(ApiResponse.success("User fetched successfully", user));
     }
 
-
-    //get current user details
+    // get current user details
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponseDto>> getUser(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -49,12 +48,12 @@ public class UserController {
                 .status(HttpStatus.FOUND)
                 .body(ApiResponse.success("User Details fetched", user));
 
-
     }
 
-    //update user
+    // update user
     @PutMapping("/update-user")
-    public ResponseEntity<ApiResponse<UserUpdateRequest>> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, Authentication authentication) {
+    public ResponseEntity<ApiResponse<UserUpdateRequest>> updateUser(@RequestBody UserUpdateRequest userUpdateRequest,
+            Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = null;
         if (userDetails != null) {
@@ -68,7 +67,7 @@ public class UserController {
                 .body(ApiResponse.success("User Details updated successfully", user));
     }
 
-    //see all movie bookings for a user
+    // see all movie bookings for a user
     @GetMapping("/bookings")
     public ResponseEntity<ApiResponse<List<BookingResponse>>> getBookings(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -80,7 +79,7 @@ public class UserController {
         List<BookingResponse> bookings = us.getBookings(userId);
 
         return ResponseEntity
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .body(ApiResponse.success("Bookings fetched successfully", bookings));
     }
 }
