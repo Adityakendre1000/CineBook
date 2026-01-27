@@ -156,7 +156,7 @@ const SignUp = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              Phone
+              {/* Phone */}
               <div>
                 <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wide">Phone Number</label>
                 <div className="relative">

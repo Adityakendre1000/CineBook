@@ -8,7 +8,7 @@ import AdminNavbar from "./AdminNavbar";
 const Navbar = () => {
     const { isAuthenticated, user } = useSelector((state) => state.auth);
 
-    if (!isAuthenticated) return <PublicNavbar />;
+    if (!isAuthenticated || !user) return <PublicNavbar />;
 
     switch (user.role) {
         case "ROLE_USER":
