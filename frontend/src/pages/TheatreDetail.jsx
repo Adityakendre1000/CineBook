@@ -189,10 +189,10 @@ const TheatreDetail = () => {
                                     </div>
 
                                     <div className="p-8 bg-[#0a0a0a]">
-                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-6">Seat Layout Preview</h4>
+                                        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-6">Seat Layout Preview ({screen.layout || 'Medium'})</h4>
                                         <div className="flex justify-center">
                                             <div className="scale-[0.8] origin-top">
-                                                <SeatLayout readOnly={true} />
+                                                <SeatLayout readOnly={true} size={screen.layout || 'Medium'} />
                                             </div>
                                         </div>
                                     </div>
