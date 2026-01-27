@@ -32,6 +32,10 @@ export const updateMovieStatus = (id) => {
 };
 
 // Approvals
+export const getAllTheatres = () => {
+    return axiosInstance.get("/admin/theatres");
+};
+
 export const getPendingTheatres = () => {
     return axiosInstance.get("/admin/approvals");
 };

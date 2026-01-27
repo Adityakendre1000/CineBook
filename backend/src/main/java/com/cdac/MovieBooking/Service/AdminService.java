@@ -25,5 +25,7 @@ public interface AdminService {
 
     List<Theatre> getPendingTheatres();
 
+    List<Theatre> getAllTheatres();
+
     Theatre approveTheatre(Long theatreId, boolean isApproved);
 }

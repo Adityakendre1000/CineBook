@@ -124,6 +124,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public List<Theatre> getAllTheatres() {
+        return theatreRepository.findAll().stream()
+                .filter(t -> t.getTheatreApprovalStatus() == TheatreApprovalStatus.APPROVED)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Theatre approveTheatre(Long theatreId, boolean isApproved) {
         Theatre theatre = theatreRepository.findById(theatreId)
                 .orElseThrow(() -> new RuntimeException("Theatre not found"));

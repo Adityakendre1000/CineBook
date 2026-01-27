@@ -1,19 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, MoreVertical, Building2, MapPin, Mail, Phone } from 'lucide-react';
+import { getAllTheatres } from '../../services/adminService';
 
 const TheatreOwners = () => {
-    // Mock data for theater owners (can be moved to mockData.js later)
-    const MOCK_OWNERS = [
-        { id: 1, name: "John Doe", theater: "Cinema Royal", email: "john@cineraroyal.com", phone: "+1 234 567 8900", location: "Brooklyn, NY", status: "Active" },
-        { id: 2, name: "Sarah Smith", theater: "Grand Theater", email: "sarah@grandtheater.com", phone: "+1 987 654 3210", location: "Los Angeles, CA", status: "Active" },
-        { id: 3, name: "Mike Johnson", theater: "Starlight Plex", email: "mike@starlight.com", phone: "+1 456 789 0123", location: "Austin, TX", status: "Active" },
-    ];
-
     const [searchTerm, setSearchTerm] = useState("");
+    const [owners, setOwners] = useState([]);
 
-    const filteredOwners = MOCK_OWNERS.filter(owner => 
-        owner.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        owner.theater.toLowerCase().includes(searchTerm.toLowerCase())
+    const fetchOwners = async () => {
+        try {
+            const response = await getAllTheatres();
+            setOwners(response.data.data);
+        } catch (error) {
+            console.error("Failed to fetch theatre owners", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchOwners();
+    }, []);
+
+    const filteredOwners = owners.filter(t => 
+        (t.owner && (t.owner.firstName + " " + t.owner.lastName).toLowerCase().includes(searchTerm.toLowerCase())) || 
+        (t.theatreName && t.theatreName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (t.location && t.location.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
@@ -28,8 +37,8 @@ const TheatreOwners = () => {
                     <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input 
                         type="text" 
-                        placeholder="Search owners..." 
-                        className="bg-[#1e1e1e] border border-white/10 rounded-lg pl-10 pr-4 py-2.5 w-64 text-sm focus:outline-none focus:border-red-600 transition-colors"
+                        placeholder="Search owners or theaters..." 
+                        className="bg-[#1e1e1e] border border-white/10 rounded-lg pl-10 pr-4 py-2.5 w-64 text-sm focus:outline-none focus:border-red-600 transition-colors text-white"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -48,38 +57,42 @@ const TheatreOwners = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
-                        {filteredOwners.map((owner) => (
-                            <tr key={owner.id} className="hover:bg-white/5 transition-colors">
+                        {filteredOwners.map((theatre) => (
+                            <tr key={theatre.theatreId} className="hover:bg-white/5 transition-colors">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
                                             <Building2 size={18} />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-white text-sm">{owner.theater}</h4>
-                                            <p className="text-gray-400 text-xs">{owner.name}</p>
+                                            <h4 className="font-bold text-white text-sm">{theatre.theatreName}</h4>
+                                            <p className="text-gray-400 text-xs">{theatre.owner ? `${theatre.owner.firstName} ${theatre.owner.lastName}` : 'N/A'}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2 text-xs text-gray-400">
-                                            <Mail size={12} /> {owner.email}
+                                            <Mail size={12} /> {theatre.owner ? theatre.owner.email : 'N/A'}
                                         </div>
                                         <div className="flex items-center gap-2 text-xs text-gray-400">
-                                            <Phone size={12} /> {owner.phone}
+                                            <Phone size={12} /> {theatre.owner ? theatre.owner.mobileNo : 'N/A'}
                                         </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-gray-400 text-sm">
                                     <div className="flex items-center gap-2">
                                         <MapPin size={14} className="text-gray-500" />
-                                        {owner.location}
+                                        {theatre.location}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">
-                                        {owner.status}
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                                        theatre.theatreStatus === 'ACTIVE' 
+                                        ? 'bg-green-500/10 text-green-400 border-green-500/20' 
+                                        : 'bg-red-500/10 text-red-400 border-red-500/20'
+                                    }`}>
+                                        {theatre.theatreStatus}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 text-right">

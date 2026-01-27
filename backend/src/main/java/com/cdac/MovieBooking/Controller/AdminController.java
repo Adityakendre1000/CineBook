@@ -61,6 +61,11 @@ public class AdminController {
     }
 
     // --- THEATRE APPROVALS ---
+    @GetMapping("/theatres")
+    public ResponseEntity<ApiResponse<List<Theatre>>> getAllTheatres() {
+        return ResponseEntity.ok(ApiResponse.success("Theatres fetched", adminService.getAllTheatres()));
+    }
+
     @GetMapping("/approvals")
     public ResponseEntity<ApiResponse<List<Theatre>>> getPendingTheatres() {
         return ResponseEntity.ok(ApiResponse.success("Pending theatres fetched", adminService.getPendingTheatres()));
