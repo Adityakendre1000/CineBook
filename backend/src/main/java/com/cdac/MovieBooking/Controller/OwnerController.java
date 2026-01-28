@@ -25,14 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/owner") 
+@RequestMapping("/owner")
 @RequiredArgsConstructor
 public class OwnerController {
 
     private final OwnerService ownerService;
     private final UserRepository userRepository;
 
-    //Helper method to get logged in users
+    // Helper method to get logged in users
     private Long getLoggedInUserId(Principal principal) {
         String email = principal.getName(); // In JWT, the 'subject' is usually the email/username
         User user = userRepository.findByEmail(email)
@@ -41,23 +41,22 @@ public class OwnerController {
     }
 
     @PostMapping("/add-theatre")
-    public ResponseEntity<ApiResponse<Theatre>> addTheatre(@Valid @RequestBody AddTheatereRequestDTO request)
-    {
-        //1 get logged-in in Owner's ID from his Token
+    public ResponseEntity<ApiResponse<Theatre>> addTheatre(@Valid @RequestBody AddTheatereRequestDTO request) {
+        // 1 get logged-in in Owner's ID from his Token
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         Long ownerId = userDetails.getUserId();
 
-        //2 Calling Service to save Data
-        Theatre savedTheatre =ownerService.addTheatre(request,ownerId);
+        // 2 Calling Service to save Data
+        Theatre savedTheatre = ownerService.addTheatre(request, ownerId);
 
-        //3.return Success responce
-        return  ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Theatre added successfullu!!",savedTheatre));
+        // 3.return Success responce
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Theatre added successfullu!!", savedTheatre));
 
     }
 
-    //Add screens API
+    // Add screens API
     @PostMapping("/add-screen")
     public ResponseEntity<Screen> addScreen(@RequestBody @Valid AddScreenRequestDTO request, Principal principal) {
         Long ownerId = getLoggedInUserId(principal);
@@ -65,10 +64,25 @@ public class OwnerController {
         return ResponseEntity.ok(screen);
     }
 
+    @org.springframework.web.bind.annotation.PutMapping("/screens/{screenId}")
+    public ResponseEntity<Screen> updateScreen(@org.springframework.web.bind.annotation.PathVariable Long screenId,
+            @RequestBody @Valid com.cdac.MovieBooking.Dtos.Request.UpdateScreenRequestDTO request,
+            Principal principal) {
+        Long ownerId = getLoggedInUserId(principal);
+        return ResponseEntity.ok(ownerService.updateScreen(screenId, request, ownerId));
+    }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/screens/{screenId}")
+    public ResponseEntity<ApiResponse<String>> deleteScreen(
+            @org.springframework.web.bind.annotation.PathVariable Long screenId) {
+        ownerService.deleteScreen(screenId);
+        return ResponseEntity.ok(ApiResponse.success("Screen deleted successfully", null));
+    }
+
     @PostMapping("/add-show")
-    public ResponseEntity<ApiResponse<Show>> addShow(@RequestBody @Valid AddShowRequestDTO request, Authentication authentication) {
-        CustomUserDetails userDetails =
-                (CustomUserDetails) authentication.getPrincipal();
+    public ResponseEntity<ApiResponse<Show>> addShow(@RequestBody @Valid AddShowRequestDTO request,
+            Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
         Long ownerId = userDetails.getUserId();
 
@@ -79,6 +93,40 @@ public class OwnerController {
                 .body(ApiResponse.success("Show added successfully", show));
     }
 
+    @org.springframework.web.bind.annotation.GetMapping("/stats")
+    public ResponseEntity<com.cdac.MovieBooking.Dtos.Response.OwnerDashboardStatsDTO> getStats(Principal principal) {
+        Long ownerId = getLoggedInUserId(principal);
+        return ResponseEntity.ok(ownerService.getStats(ownerId));
+    }
 
+    @org.springframework.web.bind.annotation.GetMapping("/theatres")
+    public ResponseEntity<java.util.List<Theatre>> getTheatres(Principal principal) {
+        Long ownerId = getLoggedInUserId(principal);
+        return ResponseEntity.ok(ownerService.getAllTheatres(ownerId));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/theatres/{theatreId}")
+    public ResponseEntity<Theatre> getTheatreById(
+            @org.springframework.web.bind.annotation.PathVariable Long theatreId) {
+        return ResponseEntity.ok(ownerService.getTheatreById(theatreId));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/theatres/{theatreId}/stats")
+    public ResponseEntity<com.cdac.MovieBooking.Dtos.Response.TheatreStatsDTO> getTheatreStats(
+            @org.springframework.web.bind.annotation.PathVariable Long theatreId) {
+        return ResponseEntity.ok(ownerService.getTheatreStats(theatreId));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/theatres/{theatreId}/bookings")
+    public ResponseEntity<java.util.List<com.cdac.MovieBooking.Dtos.Response.TheatreBookingResponseDTO>> getTheatreBookings(
+            @org.springframework.web.bind.annotation.PathVariable Long theatreId) {
+        return ResponseEntity.ok(ownerService.getTheatreBookings(theatreId));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/theatres/{theatreId}/shows")
+    public ResponseEntity<java.util.List<Show>> getTheatreShows(
+            @org.springframework.web.bind.annotation.PathVariable Long theatreId) {
+        return ResponseEntity.ok(ownerService.getTheatreShows(theatreId));
+    }
 
 }

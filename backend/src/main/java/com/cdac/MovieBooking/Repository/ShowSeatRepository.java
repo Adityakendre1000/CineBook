@@ -12,25 +12,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ShowSeatRepository extends JpaRepository<ShowSeat,Long> {
+public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
-    SELECT ss FROM ShowSeat ss
-    WHERE ss.show.showId = :showId
-    AND ss.showSeatId IN :showSeatIds
-""")
+                SELECT ss FROM ShowSeat ss
+                WHERE ss.show.showId = :showId
+                AND ss.showSeatId IN :showSeatIds
+            """)
     List<ShowSeat> lockSeats(
             @Param("showId") Long showId,
-            @Param("showSeatIds") List<Long> showSeatIds
-    );
-
+            @Param("showSeatIds") List<Long> showSeatIds);
 
     @Query("""
-    SELECT ss FROM ShowSeat ss
-    WHERE ss.showSeatStatus = 'LOCKED'
-    AND ss.lockTime < :expiry
-""")
+                SELECT ss FROM ShowSeat ss
+                WHERE ss.showSeatStatus = 'LOCKED'
+                AND ss.lockTime < :expiry
+            """)
     List<ShowSeat> findExpiredLockedSeats(
-            @Param("expiry") LocalDateTime expiry
-    );
+            @Param("expiry") LocalDateTime expiry);
+
+    // Find all seats for a specific show
+    List<ShowSeat> findByShow_ShowId(Long showId);
 }

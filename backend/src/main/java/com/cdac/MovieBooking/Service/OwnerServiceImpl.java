@@ -35,6 +35,89 @@ public class OwnerServiceImpl implements OwnerService {
         private final ShowRepository showRepository;
         private final SeatRepository seatRepository;
         private final ShowSeatRepository showSeatRepository;
+        private final BookingSeatRepository bookingSeatRepository;
+
+        private final BookingRepository bookingRepository;
+
+        @Override
+        public Theatre getTheatreById(Long theatreId) {
+                return theatreRepository.findById(theatreId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Theatre not found"));
+        }
+
+        @Override
+        public com.cdac.MovieBooking.Dtos.Response.OwnerDashboardStatsDTO getStats(Long ownerId) {
+                BigDecimal totalRevenue = bookingRepository.calculateTotalRevenueByOwner(ownerId);
+                Long ticketsSold = bookingRepository.countTicketsSoldByOwner(ownerId);
+                Long activeScreens = screenRepository.countActiveScreensByOwner(ownerId);
+
+                return com.cdac.MovieBooking.Dtos.Response.OwnerDashboardStatsDTO.builder()
+                                .revenue(totalRevenue != null ? totalRevenue : BigDecimal.ZERO)
+                                .ticketsSold(ticketsSold != null ? ticketsSold : 0L)
+                                .activeScreens(activeScreens != null ? activeScreens : 0L)
+                                .activeScreens(activeScreens != null ? activeScreens : 0L)
+                                .build();
+        }
+
+        @Override
+        public List<Theatre> getAllTheatres(Long ownerId) {
+                return theatreRepository.findByOwner_UserId(ownerId);
+        }
+
+        @Override
+        public com.cdac.MovieBooking.Dtos.Response.TheatreStatsDTO getTheatreStats(Long theatreId) {
+                BigDecimal revenue = bookingRepository.calculateTotalRevenueByTheatre(theatreId);
+                Long tickets = bookingRepository.countTicketsSoldByTheatre(theatreId);
+                Long activeShows = showRepository.countActiveShowsByTheatre(theatreId);
+
+                return com.cdac.MovieBooking.Dtos.Response.TheatreStatsDTO.builder()
+                                .revenue(revenue != null ? revenue : BigDecimal.ZERO)
+                                .visitors(tickets != null ? tickets : 0L)
+                                .activeShows(activeShows != null ? activeShows : 0L)
+                                .occupancy(0.0) // Placeholder logic for now
+                                .build();
+        }
+
+        @Override
+        public List<com.cdac.MovieBooking.Dtos.Response.TheatreBookingResponseDTO> getTheatreBookings(Long theatreId) {
+                // 1. Fetch bookings
+                List<Booking> bookings = bookingRepository.findBookingsByTheatre(theatreId);
+                if (bookings.isEmpty())
+                        return new java.util.ArrayList<>();
+
+                // 2. Fetch seats for these bookings
+                List<BookingSeat> bookingSeats = bookingSeatRepository.findByBookingIn(bookings);
+
+                // 3. Group seats by booking
+                java.util.Map<Long, java.util.List<String>> seatsMap = bookingSeats.stream()
+                                .collect(java.util.stream.Collectors.groupingBy(
+                                                bs -> bs.getBooking().getBookingId(),
+                                                java.util.stream.Collectors.mapping(
+                                                                bs -> bs.getShowSeat().getSeat().getSeatNumber(),
+                                                                java.util.stream.Collectors.toList())));
+
+                // 4. Map to DTO
+                return bookings.stream()
+                                .map(b -> com.cdac.MovieBooking.Dtos.Response.TheatreBookingResponseDTO.builder()
+                                                .bookingId(b.getBookingId())
+                                                .movieName(b.getShow().getMovie().getTitle())
+                                                .showTime(b.getShow().getShowTime().toLocalTime().toString())
+                                                .showDate(b.getShow().getShowTime().toLocalDate())
+                                                .seats(String.join(", ",
+                                                                seatsMap.getOrDefault(b.getBookingId(),
+                                                                                java.util.Collections.emptyList())))
+                                                .amount(b.getTotalAmount())
+                                                .status(b.getBookingStatus())
+                                                .customerName(b.getUser().getFirstName() + " "
+                                                                + b.getUser().getLastName())
+                                                .build())
+                                .collect(java.util.stream.Collectors.toList());
+        }
+
+        @Override
+        public List<Show> getTheatreShows(Long theatreId) {
+                return showRepository.findByScreen_Theatre_TheatreId(theatreId);
+        }
 
         @Override
         public Theatre addTheatre(AddTheatereRequestDTO request, Long ownerId) {
@@ -47,7 +130,7 @@ public class OwnerServiceImpl implements OwnerService {
                                 .theatreName(request.getTheatreName())
                                 .location(request.getLocation())
                                 .owner(owner)
-                                .TheatreApprovalStatus(TheatreApprovalStatus.PENDING)
+                                .theatreApprovalStatus(TheatreApprovalStatus.PENDING)
                                 .theatreStatus(TheatreStatus.INACTIVE)
                                 .build();
 
@@ -88,6 +171,41 @@ public class OwnerServiceImpl implements OwnerService {
                 return screenRepository.save(screen);
         }
 
+        @Override
+        public Screen updateScreen(Long screenId, com.cdac.MovieBooking.Dtos.Request.UpdateScreenRequestDTO request,
+                        Long ownerId) {
+                Screen screen = screenRepository.findById(screenId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
+
+                if (!screen.getTheatre().getOwner().getUserId().equals(ownerId)) {
+                        throw new UnauthorizedActionException("You do not own this theatre");
+                }
+
+                // Update fields
+                screen.setLayoutType(request.getLayoutType());
+
+                // Regenerate seats
+                // 1. Delete existing seats
+                List<Seat> existingSeats = seatRepository.findByScreen(screen);
+                seatRepository.deleteAll(existingSeats);
+
+                // 2. Generate new seats
+                int totalSeats = generateSeatsForScreen(screen, request.getLayoutType(), request.getRowConfig());
+                screen.setTotalSeats(totalSeats);
+
+                return screenRepository.save(screen);
+        }
+
+        @Override
+        public void deleteScreen(Long screenId) {
+                Screen screen = screenRepository.findById(screenId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
+
+                // Soft delete
+                screen.setActive(false);
+                screenRepository.save(screen);
+        }
+
         private int generateSeatsForScreen(Screen screen, LayoutType layoutType,
                         java.util.Map<String, String> rowConfig) {
                 int totalSeats = 0;
@@ -95,25 +213,20 @@ public class OwnerServiceImpl implements OwnerService {
                 java.util.LinkedHashMap<String, Integer> layoutStructure = new java.util.LinkedHashMap<>();
 
                 if (layoutType == LayoutType.SMALL) {
-                        layoutStructure.put("A", 10);
-                        layoutStructure.put("B", 12);
-                        layoutStructure.put("C", 14);
-                        layoutStructure.put("D", 14);
-                        layoutStructure.put("E", 10);
+                        // 80 Seats: 8 Rows (A-H) of 10 Columns
+                        char[] rows = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
+                        for (char r : rows)
+                                layoutStructure.put(String.valueOf(r), 10);
                 } else if (layoutType == LayoutType.MEDIUM) {
-                        layoutStructure.put("A", 15);
-                        layoutStructure.put("B", 15);
-                        layoutStructure.put("C", 15);
-                        layoutStructure.put("D", 15);
-                        layoutStructure.put("E", 15);
-                        layoutStructure.put("F", 15);
-                        layoutStructure.put("G", 12);
+                        // 150 Seats: 10 Rows (A-J) of 15 Columns
+                        char[] rows = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' };
+                        for (char r : rows)
+                                layoutStructure.put(String.valueOf(r), 15);
                 } else if (layoutType == LayoutType.LARGE) {
-                        char[] rows = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I' };
+                        // 240 Seats: 12 Rows (A-L) of 20 Columns
+                        char[] rows = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L' };
                         for (char r : rows)
                                 layoutStructure.put(String.valueOf(r), 20);
-                        layoutStructure.put("J", 15);
-                        layoutStructure.put("K", 15);
                 }
 
                 java.util.List<Seat> seatsToSave = new java.util.ArrayList<>();
@@ -192,6 +305,7 @@ public class OwnerServiceImpl implements OwnerService {
                                                 .movie(movie)
                                                 .showTime(request.getShowTime())
                                                 .showStatus(ShowStatus.ACTIVE)
+                                                .price(java.math.BigDecimal.ZERO)
                                                 .build());
 
                 // 2️. Fetch seats for screen
@@ -202,24 +316,24 @@ public class OwnerServiceImpl implements OwnerService {
                 }
 
                 // 3️. Create ShowSeats with owner-defined pricing
+                List<ShowSeat> showSeats = new java.util.ArrayList<>();
                 for (Seat seat : seats) {
-
-                        BigDecimal price = request.getSeatTypePrices()
-                                        .get(seat.getSeatType());
+                        BigDecimal price = request.getSeatTypePrices().get(seat.getSeatType());
 
                         if (price == null) {
                                 throw new InvalidRequestException(
                                                 "Invalid or missing price for seat type: " + seat.getSeatType());
                         }
 
-                        showSeatRepository.save(
-                                        ShowSeat.builder()
-                                                        .show(show)
-                                                        .seat(seat)
-                                                        .price(price)
-                                                        .showSeatStatus(ShowSeatStatus.AVAILABLE)
-                                                        .build());
+                        showSeats.add(ShowSeat.builder()
+                                        .show(show)
+                                        .seat(seat)
+                                        .price(price)
+                                        .showSeatStatus(ShowSeatStatus.AVAILABLE)
+                                        .build());
                 }
+
+                showSeatRepository.saveAll(showSeats);
 
                 log.info(
                                 "Show created successfully: showId={}, screenId={}, movieId={}",

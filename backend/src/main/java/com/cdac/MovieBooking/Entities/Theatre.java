@@ -30,7 +30,8 @@ public class Theatre {
     private User owner;
 
     @Enumerated(EnumType.STRING)
-    private TheatreApprovalStatus TheatreApprovalStatus = com.cdac.MovieBooking.Entities.Enums.TheatreApprovalStatus.PENDING;
+    @Builder.Default
+    private TheatreApprovalStatus theatreApprovalStatus = com.cdac.MovieBooking.Entities.Enums.TheatreApprovalStatus.PENDING;
 
     @ManyToOne
     @JoinColumn(name = "approved_by")
@@ -39,10 +40,14 @@ public class Theatre {
     private LocalDateTime approvedAt;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private TheatreStatus theatreStatus = TheatreStatus.INACTIVE;
+
+    @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @org.hibernate.annotations.SQLRestriction("is_active = true")
+    private java.util.List<Screen> screens;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
 }
-

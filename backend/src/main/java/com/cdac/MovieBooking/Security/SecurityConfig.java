@@ -23,75 +23,72 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config
-    ) throws Exception {
-        return config.getAuthenticationManager();
-    }
+        @Bean
+        public AuthenticationManager authenticationManager(
+                        AuthenticationConfiguration config) throws Exception {
+                return config.getAuthenticationManager();
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .cors(cors -> {})
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // PUBLIC ENDPOINTS
-                        .requestMatchers(
-                                "/auth/**",
-                                "/public/**",
-                                "/error",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-                        
-                        // ROLE BASED
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/owner/**").hasRole("OWNER")
-                        .requestMatchers("/user/**").hasAnyRole("USER")
+                http
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .csrf(csrf -> csrf.disable())
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                // PUBLIC ENDPOINTS
+                                                .requestMatchers(
+                                                                "/auth/**",
+                                                                "/public/**",
+                                                                "/error",
+                                                                "/v3/api-docs/**",
+                                                                "/swagger-ui/**",
+                                                                "/swagger-ui.html")
+                                                .permitAll()
 
-                        // ANY OTHER REQUEST
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                                                // Explicitly allow OPTIONS for all paths (CORS preflight)
+                                                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**")
+                                                .permitAll()
 
-        return http.build();
-    }
+                                                // ROLE BASED
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/owner/**").hasRole("OWNER")
+                                                .requestMatchers("/user/**").hasRole("USER")
 
+                                                // ANY OTHER REQUEST
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(
+                                                jwtAuthenticationFilter,
+                                                UsernamePasswordAuthenticationFilter.class);
 
+                return http.build();
+        }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration = new CorsConfiguration();
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
-        );
-        configuration.setAllowedMethods(
-                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        );
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+                configuration.setAllowedOrigins(
+                                List.of("http://localhost:5173"));
+                configuration.setAllowedMethods(
+                                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                configuration.setAllowedHeaders(List.of("*"));
+                configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/**", configuration);
+                source.registerCorsConfiguration("/**", configuration);
 
-        return source;
-    }
+                return source;
+        }
 }

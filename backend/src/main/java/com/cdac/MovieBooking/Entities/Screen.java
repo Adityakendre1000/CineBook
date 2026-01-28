@@ -17,10 +17,11 @@ public class Screen {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ScreenId;
+    private Long screenId;
 
     @ManyToOne
     @JoinColumn(name = "theatre_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Theatre theatre;
 
     private int screenNumber;
@@ -29,7 +30,12 @@ public class Screen {
     @Enumerated(EnumType.STRING)
     private com.cdac.MovieBooking.Entities.Enums.LayoutType layoutType;
 
+    @Builder.Default
     private boolean isActive = true;
+
+    @OneToMany(mappedBy = "screen", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private java.util.List<Show> shows;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
