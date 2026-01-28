@@ -122,3 +122,28 @@ export const MOCK_REQUESTS = [
 
 export const GENRES = ['All', 'Action', 'Sci-Fi', 'Drama', 'Thriller', 'Adventure'];
 export const TICKET_PRICE = 12;
+
+export const MOCK_GENRE_DATA = [
+  { name: 'Action', value: 400 },
+  { name: 'Sci-Fi', value: 300 },
+  { name: 'Drama', value: 300 },
+  { name: 'Thriller', value: 200 },
+];
+
+export const MOCK_REVENUE_DATA = [
+  { name: 'Jan', revenue: 4000 },
+  { name: 'Feb', revenue: 3000 },
+  { name: 'Mar', revenue: 2000 },
+  { name: 'Apr', revenue: 2780 },
+  { name: 'May', revenue: 1890 },
+  { name: 'Jun', revenue: 2390 },
+  { name: 'Jul', revenue: 3490 },
+];
+
+export const MOCK_USERS = [
+  { id: 1, name: "Alice Johnson", email: "alice@example.com", role: "ROLE_USER", joinDate: "2024-01-15", status: "Active" },
+  { id: 2, name: "Bob Smith", email: "bob@example.com", role: "ROLE_OWNER", joinDate: "2023-11-20", status: "Active" },
+  { id: 3, name: "Charlie Brown", email: "charlie@example.com", role: "ROLE_USER", joinDate: "2024-02-10", status: "Deleted" },
+  { id: 4, name: "Diana Prince", email: "diana@example.com", role: "ROLE_ADMIN", joinDate: "2023-10-05", status: "Active" },
+  { id: 5, name: "Evan Wright", email: "evan@example.com", role: "ROLE_USER", joinDate: "2024-03-01", status: "Active" },
+ ];

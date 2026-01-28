@@ -12,10 +12,17 @@ import TheaterSelectionPage from "./pages/TheaterSelectionPage";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import TheatreList from "./pages/TheatreList";
 import TheatreDetail from "./pages/TheatreDetail";
-import SuperAdminView from "./pages/SuperAdminView";
 import MyBookings from "./pages/MyBookings";
 import MovieSeats from "./components/movie/MovieSeats";
 import SeatSelectionPage from "./pages/SeatSelectionPage";
+
+// Admin Pages
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UsersList from "./pages/admin/UsersList";
+import MoviesList from "./pages/admin/MoviesList";
+import PendingApprovals from "./pages/admin/PendingApprovals";
+import TheatreOwners from "./pages/admin/TheatreOwners";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { ToastProvider } from "./context/ToastContext";
@@ -60,8 +67,17 @@ const App = () => {
 
 
             {/* SUPER ADMIN ROUTES */}
-            <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
-              <Route path="/superadmin" element={<SuperAdminView />} />
+            <Route path="/superadmin" element={
+              <ProtectedRoute allowedRoles={["ROLE_ADMIN"]}>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<UsersList />} />
+              <Route path="movies" element={<MoviesList />} />
+              <Route path="approvals" element={<PendingApprovals />} />
+              <Route path="owners" element={<TheatreOwners />} />
             </Route>
 
             {/* FALLBACK */}
