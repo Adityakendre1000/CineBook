@@ -29,3 +29,12 @@ export const getShowsByMovieId = async (movieId) => {
     }
 };
 
+
+export const submitMovieFeedback = async (movieId, feedbackData) => {
+    try {
+        const response = await axiosInstance.post(`/user/movies/${movieId}/feedback`, feedbackData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

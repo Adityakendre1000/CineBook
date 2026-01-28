@@ -15,6 +15,7 @@ import TheatreDetail from "./pages/TheatreDetail";
 import MyBookings from "./pages/MyBookings";
 import MovieSeats from "./components/movie/MovieSeats";
 import SeatSelectionPage from "./pages/SeatSelectionPage";
+import FeedbackPage from "./pages/FeedbackPage";
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
@@ -52,6 +53,7 @@ const App = () => {
               <Route path="/userview" element={<UserView />} />
               <Route path="/my-bookings" element={<MyBookings />} />
               <Route path="/book/:id" element={<TheaterSelectionPage />} />
+              <Route path="/feedback/:movieId" element={<FeedbackPage />} />
 
             </Route>
 
