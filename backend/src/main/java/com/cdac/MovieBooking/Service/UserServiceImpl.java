@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
         Screen screen = show.getScreen();
         Theatre theatre = screen.getTheatre();
 
-        // 🔹 Fetch seats
+        //  Fetch seats
         List<String> seatNumbers =
                 bookingSeatRepository.findByBooking(booking)
                         .stream()
