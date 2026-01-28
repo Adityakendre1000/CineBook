@@ -12,6 +12,8 @@ public class AddScreenRequestDTO {
     private Long theatreId;
 
     @NotNull(message = "Layout Type is required")
+
+    @NotNull(message = "Layout Type is required")
     private com.cdac.MovieBooking.Entities.Enums.LayoutType layoutType;
 
     // Map of Row Name (e.g., "A", "A-D") to SeatType (NORMAL, PRIME, RECLINER)

@@ -10,7 +10,6 @@ public interface PublicService {
 
     // Movies
 
-
     List<Movie> getAllMovies();
 
     Movie getMovieById(Long id);
@@ -21,8 +20,9 @@ public interface PublicService {
 
     List<TheatreResponseDTO> getAllTheatres();
 
-
-
     // Shows
     List<ShowResponseDTO> getShowsByMovie(Long movieId);
+
+    // Seats
+    com.cdac.MovieBooking.Dtos.Response.SeatLayoutResponseDTO getSeatsForShow(Long showId);
 }

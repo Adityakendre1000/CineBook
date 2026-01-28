@@ -2,20 +2,29 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, Filter, Download, CheckCircle, Clock } from 'lucide-react';
 
+import ownerService from '../../services/ownerService';
+
 const TheatreBookings = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
+    const [bookings, setBookings] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Mock Booking Data
-    // In a real app, this would come from an API endpoint: GET /owner/bookings?theatreId=xyz
-    const bookings = [
-        { id: 'BK-7829', movie: 'Inception', showTime: '10:00 AM', date: '2024-02-15', seats: 'A1, A2', amount: 450, status: 'CONFIRMED', customer: 'John Doe' },
-        { id: 'BK-7830', movie: 'The Dark Knight', showTime: '02:00 PM', date: '2024-02-15', seats: 'C5, C6, C7', amount: 900, status: 'CONFIRMED', customer: 'Jane Smith' },
-        { id: 'BK-7831', movie: 'Interstellar', showTime: '06:00 PM', date: '2024-02-15', seats: 'D10', amount: 250, status: 'PENDING', customer: 'Alice Brown' },
-        { id: 'BK-7832', movie: 'Inception', showTime: '10:00 AM', date: '2024-02-16', seats: 'B4, B5', amount: 500, status: 'CANCELLED', customer: 'Bob Wilson' },
-        { id: 'BK-7833', movie: 'Avatar 2', showTime: '09:00 PM', date: '2024-02-16', seats: 'F1, F2', amount: 600, status: 'CONFIRMED', customer: 'Charlie Davis' },
-    ];
+    React.useEffect(() => {
+        const fetchBookings = async () => {
+            setIsLoading(true);
+            try {
+                const data = await ownerService.getTheatreBookings(id);
+                setBookings(data);
+            } catch (error) {
+                console.error("Failed to fetch bookings", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchBookings();
+    }, [id]);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -25,6 +34,12 @@ const TheatreBookings = () => {
             default: return 'text-gray-500 bg-gray-500/10';
         }
     };
+
+    const filteredBookings = bookings.filter(booking => 
+        booking.bookingId.toString().includes(searchTerm) ||
+        booking.movieName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.customerName?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="p-6 space-y-8 animate-fade-in text-white min-h-screen">
@@ -42,11 +57,14 @@ const TheatreBookings = () => {
                         <p className="text-gray-400">All bookings for Theatre ID: #{id}</p>
                     </div>
                 </div>
-                <button
-                    className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2 font-bold"
-                >
-                    <Download size={18} /> Export CSV
-                </button>
+                {/* Export CSV placeholder - Disabled for now or implemented later */}
+                {bookings.length > 0 && (
+                    <button
+                        className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2 font-bold"
+                    >
+                        <Download size={18} /> Export CSV
+                    </button>
+                )}
             </div>
 
             {/* Filters & Search */}
@@ -68,9 +86,6 @@ const TheatreBookings = () => {
                         <option>Pending</option>
                         <option>Cancelled</option>
                     </select>
-                    <button className="bg-white/5 hover:bg-white/10 p-2.5 rounded-lg border border-white/10">
-                        <Filter size={20} className="text-gray-400" />
-                    </button>
                 </div>
             </div>
 
@@ -90,28 +105,38 @@ const TheatreBookings = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
-                            {bookings.map((booking) => (
-                                <tr key={booking.id} className="hover:bg-white/5 transition-colors">
-                                    <td className="px-6 py-4 font-mono text-sm text-purple-400">{booking.id}</td>
-                                    <td className="px-6 py-4 font-bold">{booking.customer}</td>
-                                    <td className="px-6 py-4">{booking.movie}</td>
-                                    <td className="px-6 py-4 text-gray-400 text-sm">
-                                        <div className="flex flex-col">
-                                            <span>{booking.date}</span>
-                                            <span className="text-xs">{booking.showTime}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm">{booking.seats}</td>
-                                    <td className="px-6 py-4 font-bold">₹{booking.amount}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${getStatusColor(booking.status)}`}>
-                                            {booking.status === 'CONFIRMED' && <CheckCircle size={12} />}
-                                            {booking.status === 'PENDING' && <Clock size={12} />}
-                                            {booking.status}
-                                        </span>
-                                    </td>
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan="7" className="px-6 py-8 text-center text-gray-400">Loading bookings...</td>
                                 </tr>
-                            ))}
+                            ) : filteredBookings.length === 0 ? (
+                                <tr>
+                                    <td colSpan="7" className="px-6 py-8 text-center text-gray-400">No bookings found.</td>
+                                </tr>
+                            ) : (
+                                filteredBookings.map((booking) => (
+                                    <tr key={booking.bookingId} className="hover:bg-white/5 transition-colors">
+                                        <td className="px-6 py-4 font-mono text-sm text-purple-400">#{booking.bookingId}</td>
+                                        <td className="px-6 py-4 font-bold">{booking.customerName}</td>
+                                        <td className="px-6 py-4">{booking.movieName}</td>
+                                        <td className="px-6 py-4 text-gray-400 text-sm">
+                                            <div className="flex flex-col">
+                                                <span>{booking.showDate}</span>
+                                                <span className="text-xs">{booking.showTime}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm">{booking.seats}</td>
+                                        <td className="px-6 py-4 font-bold">₹{booking.amount}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${getStatusColor(booking.status)}`}>
+                                                {booking.status === 'CONFIRMED' && <CheckCircle size={12} />}
+                                                {booking.status === 'PENDING' && <Clock size={12} />}
+                                                {booking.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

@@ -73,14 +73,19 @@ const TheaterSelectionPage = () => {
         filteredShows.forEach(show => {
             if (!theaterMap.has(show.theatreName)) {
                 theaterMap.set(show.theatreName, {
-                    id: show.screenId, // Using screenId as unique key for now, ideally should be theaterId
+                    id: show.screenId,
                     name: show.theatreName,
                     location: show.location,
                     times: []
                 });
             }
             const timeString = new Date(show.showTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            theaterMap.get(show.theatreName).times.push(timeString);
+            theaterMap.get(show.theatreName).times.push({
+                time: timeString,
+                showId: show.showId,
+                showTime: show.showTime,
+                availableSeats: show.availableSeats
+            });
         });
 
         return Array.from(theaterMap.values());
@@ -92,9 +97,9 @@ const TheaterSelectionPage = () => {
     const handleBack = () => {
         navigate(-1);
     }
-    const handleTimeSelect = (theater, time) => {
-        // Construct the URL with query parameters
-        const url = `/movie/seats/${theater.id}/${movie.id}?date=${selectedDate}&time=${time}&theaterName=${encodeURIComponent(theater.name)}&price=15`;
+    const handleTimeSelect = (theater, timeObj) => {
+        // Navigate with showId
+        const url = `/movie/seats/${timeObj.showId}?date=${selectedDate}&time=${timeObj.time}&theaterName=${encodeURIComponent(theater.name)}`;
         navigate(url);
     };
 
@@ -164,13 +169,14 @@ const TheaterSelectionPage = () => {
 
                                     {/* Time Pills */}
                                     <div className="flex flex-wrap gap-3">
-                                        {theater.times.map((time, idx) => (
+                                        {theater.times.map((timeObj, idx) => (
                                             <button
                                                 key={idx}
-                                                onClick={() => handleTimeSelect(theater, time)}
+                                                onClick={() => handleTimeSelect(theater, timeObj)}
                                                 className="px-4 py-2 rounded-lg border border-green-500/30 text-green-400 text-sm font-medium hover:bg-red-600 hover:border-red-600 hover:text-white transition-all"
                                             >
-                                                {time}
+                                                {timeObj.time}
+                                                <span className="ml-2 text-xs opacity-70">({timeObj.availableSeats} seats)</span>
                                             </button>
                                         ))}
                                     </div>

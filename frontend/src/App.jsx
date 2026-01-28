@@ -11,7 +11,8 @@ import TermsAndServices from "./pages/TermsAndServices";
 import TheaterSelectionPage from "./pages/TheaterSelectionPage";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import TheatreList from "./pages/TheatreList";
-import TheatreDetail from "./pages/TheatreDetail";
+import TheatreStats from "./pages/owner/TheatreStats";
+import TheatreManage from "./pages/owner/TheatreManage";
 import MyBookings from "./pages/MyBookings";
 import MovieSeats from "./components/movie/MovieSeats";
 import SeatSelectionPage from "./pages/SeatSelectionPage";
@@ -46,7 +47,7 @@ const App = () => {
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/terms-and-services" element={<TermsAndServices />} />
             <Route path="/movie/:id" element={<MovieDetailPage />} />
-            <Route path='/movie/seats/:theaterId/:movieId' element={<SeatSelectionPage />} />
+            <Route path='/movie/seats/:showId' element={<SeatSelectionPage />} />
 
             {/* USER ROUTES */}
             <Route element={<ProtectedRoute allowedRoles={["ROLE_USER"]} />}>
@@ -61,7 +62,8 @@ const App = () => {
             <Route element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]} />}>
               <Route path="/owner/dashboard" element={<OwnerDashboard />} />
               <Route path="/owner/theatres" element={<TheatreList />} />
-              <Route path="/owner/theatres/:id" element={<TheatreDetail />} />
+              <Route path="/owner/theatres/:id/stats" element={<TheatreStats />} />
+              <Route path="/owner/theatres/:id/manage" element={<TheatreManage />} />
               {/* Redirect old route /theaterowner to new dashboard */}
               <Route path="/theaterowner" element={<Navigate to="/owner/dashboard" replace />} />
             </Route>

@@ -33,4 +33,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT COUNT(b) FROM Booking b JOIN b.show s JOIN s.screen sc JOIN sc.theatre t JOIN t.owner o WHERE o.userId = :ownerId AND b.bookingStatus = 'CONFIRMED'")
     Long countTicketsSoldByOwner(@Param("ownerId") Long ownerId);
 
+    // Theatre Specific
+
+    @Query("SELECT SUM(b.totalAmount) FROM Booking b JOIN b.show s JOIN s.screen sc WHERE sc.theatre.theatreId = :theatreId AND b.bookingStatus = 'CONFIRMED'")
+    BigDecimal calculateTotalRevenueByTheatre(@Param("theatreId") Long theatreId);
+
+    @Query("SELECT COUNT(b) FROM Booking b JOIN b.show s JOIN s.screen sc WHERE sc.theatre.theatreId = :theatreId AND b.bookingStatus = 'CONFIRMED'")
+    Long countTicketsSoldByTheatre(@Param("theatreId") Long theatreId);
+
+    @Query("SELECT DISTINCT b FROM Booking b JOIN FETCH b.show s JOIN FETCH s.movie JOIN FETCH b.user WHERE s.screen.theatre.theatreId = :theatreId ORDER BY b.bookingTime DESC")
+    List<Booking> findBookingsByTheatre(@Param("theatreId") Long theatreId);
+
 }

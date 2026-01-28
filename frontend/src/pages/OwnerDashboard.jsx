@@ -46,11 +46,11 @@ const OwnerDashboard = () => {
                 {[
                     {
                         label: 'Total Revenue',
-                        value: `₹${stats?.revenue || '0'}`,
+                        value: stats?.revenue ? `₹${Number(stats.revenue).toLocaleString()}` : '₹0',
                         icon: DollarSign,
                         color: 'text-green-400',
                         bg: 'bg-green-500/10',
-                        trend: '+12.5% vs last month'
+                        trend: 'Total earnings'
                     },
                     {
                         label: 'Tickets Sold',
@@ -58,15 +58,15 @@ const OwnerDashboard = () => {
                         icon: Ticket,
                         color: 'text-red-400',
                         bg: 'bg-red-500/10',
-                        trend: '+5.2% vs last month'
+                        trend: 'Lifetime bookings'
                     },
                     {
                         label: 'Active Screens',
-                        value: `${stats?.activeScreens || 0} / 15`,
+                        value: stats?.activeScreens || '0',
                         icon: Monitor,
                         color: 'text-blue-400',
                         bg: 'bg-blue-500/10',
-                        trend: '2 Screens under maintenance'
+                        trend: 'Currently operational'
                     }
                 ].map((stat, index) => (
                     <div key={index} className="bg-[#1e1e1e] p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all">

@@ -64,6 +64,21 @@ public class OwnerController {
         return ResponseEntity.ok(screen);
     }
 
+    @org.springframework.web.bind.annotation.PutMapping("/screens/{screenId}")
+    public ResponseEntity<Screen> updateScreen(@org.springframework.web.bind.annotation.PathVariable Long screenId,
+            @RequestBody @Valid com.cdac.MovieBooking.Dtos.Request.UpdateScreenRequestDTO request,
+            Principal principal) {
+        Long ownerId = getLoggedInUserId(principal);
+        return ResponseEntity.ok(ownerService.updateScreen(screenId, request, ownerId));
+    }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/screens/{screenId}")
+    public ResponseEntity<ApiResponse<String>> deleteScreen(
+            @org.springframework.web.bind.annotation.PathVariable Long screenId) {
+        ownerService.deleteScreen(screenId);
+        return ResponseEntity.ok(ApiResponse.success("Screen deleted successfully", null));
+    }
+
     @PostMapping("/add-show")
     public ResponseEntity<ApiResponse<Show>> addShow(@RequestBody @Valid AddShowRequestDTO request,
             Authentication authentication) {
@@ -88,6 +103,30 @@ public class OwnerController {
     public ResponseEntity<java.util.List<Theatre>> getTheatres(Principal principal) {
         Long ownerId = getLoggedInUserId(principal);
         return ResponseEntity.ok(ownerService.getAllTheatres(ownerId));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/theatres/{theatreId}")
+    public ResponseEntity<Theatre> getTheatreById(
+            @org.springframework.web.bind.annotation.PathVariable Long theatreId) {
+        return ResponseEntity.ok(ownerService.getTheatreById(theatreId));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/theatres/{theatreId}/stats")
+    public ResponseEntity<com.cdac.MovieBooking.Dtos.Response.TheatreStatsDTO> getTheatreStats(
+            @org.springframework.web.bind.annotation.PathVariable Long theatreId) {
+        return ResponseEntity.ok(ownerService.getTheatreStats(theatreId));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/theatres/{theatreId}/bookings")
+    public ResponseEntity<java.util.List<com.cdac.MovieBooking.Dtos.Response.TheatreBookingResponseDTO>> getTheatreBookings(
+            @org.springframework.web.bind.annotation.PathVariable Long theatreId) {
+        return ResponseEntity.ok(ownerService.getTheatreBookings(theatreId));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/theatres/{theatreId}/shows")
+    public ResponseEntity<java.util.List<Show>> getTheatreShows(
+            @org.springframework.web.bind.annotation.PathVariable Long theatreId) {
+        return ResponseEntity.ok(ownerService.getTheatreShows(theatreId));
     }
 
 }

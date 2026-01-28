@@ -1,52 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import BookingView from '../components/movie/MovieSeats';
-import { getMovieById } from '../services/movieService';
+import bookingService from '../services/bookingService';
 
 const SeatSelectionPage = () => {
-    const { theaterId, movieId } = useParams();
+    const { showId } = useParams();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
     const date = searchParams.get('date');
     const time = searchParams.get('time');
     const theaterName = searchParams.get('theaterName');
-    const ticketPrice = parseFloat(searchParams.get('price')) || 15; // Default price if not passed
 
-    const [movie, setMovie] = useState(null);
+    const [seatLayout, setSeatLayout] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedSeats, setSelectedSeats] = useState([]);
 
-    // Mock occupied seats for now
-    const [occupiedSeats, setOccupiedSeats] = useState(['A3', 'B4', 'C1', 'C2']);
-
     useEffect(() => {
-        const fetchMovie = async () => {
+        const fetchSeatLayout = async () => {
             try {
-                const response = await getMovieById(movieId);
+                const response = await bookingService.getShowSeats(showId);
+                console.log("Seat layout response:", response);
+                
                 if (response && response.data) {
-                    const backendMovie = response.data;
-                    setMovie({
-                        id: backendMovie.movieId,
-                        title: backendMovie.title,
-                        genre: backendMovie.genre,
-                        rating: backendMovie.rating,
-                        duration: `${backendMovie.durationMinutes} mins`,
-                        image: backendMovie.posterUrl || 'https://via.placeholder.com/1280x720',
-                    });
+                    setSeatLayout(response.data);
                 } else {
-                    setError("Movie not found");
+                    setError("Seat layout not found");
                 }
             } catch (err) {
-                console.error("Error fetching movie:", err);
-                setError("Failed to load movie details");
+                console.error("Error fetching seat layout:", err);
+                setError("Failed to load seat layout");
             } finally {
                 setLoading(false);
             }
         };
-        fetchMovie();
-    }, [movieId]);
+        fetchSeatLayout();
+    }, [showId]);
 
     const handleSeatClick = (seatId) => {
         if (selectedSeats.includes(seatId)) {
@@ -61,21 +51,26 @@ const SeatSelectionPage = () => {
         alert(`Proceeding to payment for seats: ${selectedSeats.join(', ')}`);
     };
 
-    if (loading) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">Loading...</div>;
+    if (loading) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">Loading seat layout...</div>;
     if (error) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">{error}</div>;
+    if (!seatLayout) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">No seat layout available</div>;
+
+    // Extract movie info from first seat (all seats belong to same show)
+    const firstSeat = seatLayout.seatsByRow[seatLayout.rows[0]]?.[0];
+    const movie = {
+        title: "Movie Title", // This will be shown in BookingView
+    };
 
     return (
         <BookingView
-            movie={movie}
-            theater={{ id: theaterId, name: theaterName }}
+            seatLayout={seatLayout}
+            theater={{ name: theaterName }}
             date={date}
             time={time}
             selectedSeats={selectedSeats}
-            occupiedSeats={occupiedSeats}
             onSeatClick={handleSeatClick}
             onBack={() => navigate(-1)}
             onPayment={handlePayment}
-            ticketPrice={ticketPrice}
         />
     );
 };

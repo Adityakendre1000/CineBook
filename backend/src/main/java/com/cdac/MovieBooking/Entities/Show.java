@@ -23,10 +23,12 @@ public class Show {
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Movie movie;
 
     @ManyToOne
     @JoinColumn(name = "screen_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "theatre" })
     private Screen screen;
 
     private LocalDateTime showTime;
@@ -39,4 +41,3 @@ public class Show {
     private LocalDateTime createdAt;
 
 }
-
