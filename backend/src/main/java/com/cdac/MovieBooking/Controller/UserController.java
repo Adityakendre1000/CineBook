@@ -87,6 +87,22 @@ public class UserController {
                 .body(ApiResponse.success("Bookings fetched successfully", bookings));
     }
 
+    @GetMapping("/bookings/{bookingId}")
+    public ResponseEntity<ApiResponse<BookingResponse>> getBookingById(
+            @PathVariable Long bookingId,
+            Authentication authentication
+    ) {
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        BookingResponse booking =
+                us.getBookingById(bookingId, userDetails.getUserId());
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Booking fetched successfully", booking)
+        );
+    }
+
     @PostMapping("/payments/verify")
     public ResponseEntity<ApiResponse<String>> verifyPayment(@RequestBody PaymentVerifyRequest request, Authentication authentication) {
         CustomUserDetails userDetails =

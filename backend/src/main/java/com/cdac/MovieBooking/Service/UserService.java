@@ -15,4 +15,6 @@ public interface UserService {
     UserUpdateRequest updateUserDetails(UserUpdateRequest userUpdateRequest, Long userId);
 
     List<BookingResponse> getBookings(Long userId);
+
+    BookingResponse getBookingById(Long bookingId, Long userId);
 }
