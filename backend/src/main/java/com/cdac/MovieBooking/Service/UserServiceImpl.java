@@ -3,9 +3,11 @@ package com.cdac.MovieBooking.Service;
 import com.cdac.MovieBooking.Dtos.Request.UserUpdateRequest;
 import com.cdac.MovieBooking.Dtos.Response.BookingResponse;
 import com.cdac.MovieBooking.Dtos.Response.UserResponseDto;
-import com.cdac.MovieBooking.Entities.User;
+import com.cdac.MovieBooking.Entities.*;
 import com.cdac.MovieBooking.Exception.ResourceNotFoundException;
+import com.cdac.MovieBooking.Exception.UnauthorizedActionException;
 import com.cdac.MovieBooking.Repository.BookingRepository;
+import com.cdac.MovieBooking.Repository.BookingSeatRepository;
 import com.cdac.MovieBooking.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository ur;
     private final ModelMapper modelMapper;
     private final BookingRepository br;
+    private final BookingSeatRepository bookingSeatRepository;
 
     @Override
     public UserResponseDto getUserByEmail(String userEmail) {
@@ -103,4 +106,59 @@ public class UserServiceImpl implements UserService {
                         .build())
                 .toList();
     }
+
+    @Override
+    public BookingResponse getBookingById(Long bookingId, Long userId) {
+
+        Booking booking = br
+                .findByBookingIdAndUser_UserId(bookingId, userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Booking not found")
+                );
+
+        Show show = booking.getShow();
+        Movie movie = show.getMovie();
+        Screen screen = show.getScreen();
+        Theatre theatre = screen.getTheatre();
+
+        // 🔹 Fetch seats
+        List<String> seatNumbers =
+                bookingSeatRepository.findByBooking(booking)
+                        .stream()
+                        .map(bs -> bs.getShowSeat().getSeat().getSeatNumber())
+                        .toList();
+
+        return BookingResponse.builder()
+
+                // Booking info
+                .bookingId(booking.getBookingId())
+                .bookingStatus(booking.getBookingStatus())
+                .bookingTime(booking.getBookingTime())
+                .totalAmount(booking.getTotalAmount())
+
+                // Show info
+                .showId(show.getShowId())
+                .showTime(show.getShowTime())
+                .showPrice(show.getPrice())
+
+                // Movie info
+                .movieId(movie.getMovieId())
+                .movieTitle(movie.getTitle())
+                .language(movie.getLanguage())
+                .genre(movie.getGenre())
+                .durationMinutes(movie.getDurationMinutes())
+                .posterUrl(movie.getPosterUrl())
+
+                // Theatre / Screen info
+                .theatreId(theatre.getTheatreId())
+                .theatreName(theatre.getTheatreName())
+                .screenNumber(screen.getScreenNumber())
+
+
+                .seats(seatNumbers)
+
+                .build();
+    }
+
+
 }

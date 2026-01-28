@@ -6,6 +6,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -35,4 +37,8 @@ public class BookingResponse {
     private Long theatreId;
     private String theatreName;
     private Integer screenNumber;
+
+
+    private List<String> seats;
 }
+
