@@ -34,7 +34,27 @@ public class OwnerServiceImpl implements OwnerService {
         private final MovieRepository movieRepository;
         private final ShowRepository showRepository;
         private final SeatRepository seatRepository;
-        private final ShowSeatRepository showSeatRepository;
+
+        private final BookingRepository bookingRepository;
+
+        @Override
+        public com.cdac.MovieBooking.Dtos.Response.OwnerDashboardStatsDTO getStats(Long ownerId) {
+                BigDecimal totalRevenue = bookingRepository.calculateTotalRevenueByOwner(ownerId);
+                Long ticketsSold = bookingRepository.countTicketsSoldByOwner(ownerId);
+                Long activeScreens = screenRepository.countActiveScreensByOwner(ownerId);
+
+                return com.cdac.MovieBooking.Dtos.Response.OwnerDashboardStatsDTO.builder()
+                                .revenue(totalRevenue != null ? totalRevenue : BigDecimal.ZERO)
+                                .ticketsSold(ticketsSold != null ? ticketsSold : 0L)
+                                .activeScreens(activeScreens != null ? activeScreens : 0L)
+                                .activeScreens(activeScreens != null ? activeScreens : 0L)
+                                .build();
+        }
+
+        @Override
+        public List<Theatre> getAllTheatres(Long ownerId) {
+                return theatreRepository.findByOwner_UserId(ownerId);
+        }
 
         @Override
         public Theatre addTheatre(AddTheatereRequestDTO request, Long ownerId) {

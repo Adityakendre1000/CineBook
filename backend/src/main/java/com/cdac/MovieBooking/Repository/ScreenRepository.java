@@ -15,4 +15,7 @@ public interface ScreenRepository extends JpaRepository<Screen, Long> {
 
     @Query("SELECT MAX(s.screenNumber) FROM Screen s WHERE s.theatre.theatreId = :theatreId")
     Integer findMaxScreenNumber(@Param("theatreId") Long theatreId);
+
+    @Query("SELECT COUNT(s) FROM Screen s JOIN s.theatre t JOIN t.owner o WHERE o.userId = :ownerId AND s.isActive = true")
+    Long countActiveScreensByOwner(@Param("ownerId") Long ownerId);
 }

@@ -10,8 +10,8 @@ const ownerService = {
             const response = await axiosInstance.get(`${OWNER_API_URL}/stats`);
             return response.data;
         } catch (error) {
-            console.warn("API Get Stats Failed, falling back to Mock Data:", error);
-            return MOCK_STATS;
+            console.error("API Get Stats Failed:", error);
+            throw error;
         }
     },
 
