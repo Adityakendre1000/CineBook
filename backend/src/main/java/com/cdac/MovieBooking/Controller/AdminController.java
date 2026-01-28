@@ -21,13 +21,13 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    // --- DASHBOARD STATS ---
+    //  DASHBOARD STATS
     @GetMapping("/stats")
     public ResponseEntity<ApiResponse<AdminDashboardStatsDTO>> getStats() {
         return ResponseEntity.ok(ApiResponse.success("Stats fetched", adminService.getDashboardStats()));
     }
 
-    // --- USER MANAGEMENT ---
+    // USER MANAGEMENT
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
         return ResponseEntity.ok(ApiResponse.success("Users fetched", adminService.getAllUsers()));
@@ -38,7 +38,7 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("User status updated", adminService.updateUserStatus(id)));
     }
 
-    // --- MOVIE MANAGEMENT ---
+    //  MOVIE MANAGEMENT
     @GetMapping("/movies")
     public ResponseEntity<ApiResponse<List<Movie>>> getAllMovies() {
         return ResponseEntity.ok(ApiResponse.success("Movies fetched", adminService.getAllMovies()));
@@ -60,7 +60,7 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("Movie status updated", adminService.updateMovieStatus(id)));
     }
 
-    // --- THEATRE APPROVALS ---
+    // THEATRE APPROVALS
     @GetMapping("/theatres")
     public ResponseEntity<ApiResponse<List<Theatre>>> getAllTheatres() {
         return ResponseEntity.ok(ApiResponse.success("Theatres fetched", adminService.getAllTheatres()));
