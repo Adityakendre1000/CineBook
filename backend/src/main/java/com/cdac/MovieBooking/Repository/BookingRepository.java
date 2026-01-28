@@ -44,4 +44,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT DISTINCT b FROM Booking b JOIN FETCH b.show s JOIN FETCH s.movie JOIN FETCH b.user WHERE s.screen.theatre.theatreId = :theatreId ORDER BY b.bookingTime DESC")
     List<Booking> findBookingsByTheatre(@Param("theatreId") Long theatreId);
 
+    Optional<Booking> findByBookingIdAndUser_UserId(Long bookingId, Long userId);
+
 }
