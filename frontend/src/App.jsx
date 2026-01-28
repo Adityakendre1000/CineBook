@@ -29,6 +29,7 @@ import TheatreOwners from "./pages/admin/TheatreOwners";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { ToastProvider } from "./context/ToastContext";
 import Navbar from "./components/navbar/Navbar";
+import BookingSuccessPage from "./pages/BookingSuccessPage";
 
 const App = () => {
   return (
@@ -38,6 +39,7 @@ const App = () => {
       <div className="max-w-6xl mx-auto px-4 pt-6">
         <ToastProvider>
           <Routes>
+
             {/* DEFAULT */}
             <Route path="/" element={<Navigate to="/login" replace />} />
 
@@ -55,7 +57,7 @@ const App = () => {
               <Route path="/my-bookings" element={<MyBookings />} />
               <Route path="/book/:id" element={<TheaterSelectionPage />} />
               <Route path="/feedback/:movieId" element={<FeedbackPage />} />
-
+              <Route path="/booking-success" element={<BookingSuccessPage />} />
             </Route>
 
             {/* THEATER OWNER ROUTES */}

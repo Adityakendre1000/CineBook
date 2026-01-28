@@ -17,19 +17,18 @@ const SeatSelectionPage = () => {
     const [error, setError] = useState(null);
     const [selectedSeats, setSelectedSeats] = useState([]);
 
+    /* ---------------- FETCH SEATS ---------------- */
     useEffect(() => {
         const fetchSeatLayout = async () => {
             try {
                 const response = await bookingService.getShowSeats(showId);
-                console.log("Seat layout response:", response);
-                
-                if (response && response.data) {
+                if (response?.data) {
                     setSeatLayout(response.data);
                 } else {
                     setError("Seat layout not found");
                 }
             } catch (err) {
-                console.error("Error fetching seat layout:", err);
+                console.error(err);
                 setError("Failed to load seat layout");
             } finally {
                 setLoading(false);
@@ -38,28 +37,82 @@ const SeatSelectionPage = () => {
         fetchSeatLayout();
     }, [showId]);
 
+    /* ---------------- SEAT TOGGLE ---------------- */
     const handleSeatClick = (seatId) => {
-        if (selectedSeats.includes(seatId)) {
-            setSelectedSeats(selectedSeats.filter(id => id !== seatId));
-        } else {
-            setSelectedSeats([...selectedSeats, seatId]);
+        setSelectedSeats(prev =>
+            prev.includes(seatId)
+                ? prev.filter(id => id !== seatId)
+                : [...prev, seatId]
+        );
+    };
+
+    /* ---------------- PAYMENT FLOW ---------------- */
+    const handlePayment = async (totalAmount) => {
+        try {
+            // 1️⃣ Initiate booking (LOCK seats + Razorpay order)
+            const bookingRes = await bookingService.initiateBooking({
+                showId: Number(showId),
+                seatIds: selectedSeats
+            });
+
+            const { razorpayOrderId, bookingId, amount, currency } = bookingRes.data;
+
+            // 2️⃣ Razorpay options
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: amount * 100, // paise
+                currency,
+                name: "CineBook",
+                description: "Movie Ticket Booking",
+                order_id: razorpayOrderId,
+
+                handler: async (response) => {
+                    try {
+                        // 3️⃣ Verify payment
+                        await bookingService.verifyPayment({
+                            razorpayOrderId: response.razorpay_order_id,
+                            razorpayPaymentId: response.razorpay_payment_id,
+                            razorpaySignature: response.razorpay_signature
+                        });
+
+                        // 4️⃣ Success → redirect
+                        navigate("/booking-success", { state: { bookingId } });
+
+                    } catch (err) {
+                        console.error("Payment verification failed", err);
+                        alert("Payment verification failed");
+                    }
+                },
+
+                modal: {
+                    ondismiss: async () => {
+                        // 5️⃣ Payment cancelled
+                        await bookingService.paymentFailure({
+                            razorpayOrderId
+                        });
+                        alert("Payment cancelled");
+                    }
+                },
+
+                theme: {
+                    color: "#dc2626"
+                }
+            };
+
+            // 6️⃣ Open Razorpay
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+
+        } catch (err) {
+            console.error("Booking initiation failed", err);
+            alert(err.response?.data?.error || "Booking failed");
         }
     };
 
-    const handlePayment = () => {
-        // Navigate to payment or show confirmation
-        alert(`Proceeding to payment for seats: ${selectedSeats.join(', ')}`);
-    };
-
+    /* ---------------- UI STATES ---------------- */
     if (loading) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">Loading seat layout...</div>;
     if (error) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">{error}</div>;
     if (!seatLayout) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">No seat layout available</div>;
-
-    // Extract movie info from first seat (all seats belong to same show)
-    const firstSeat = seatLayout.seatsByRow[seatLayout.rows[0]]?.[0];
-    const movie = {
-        title: "Movie Title", // This will be shown in BookingView
-    };
 
     return (
         <BookingView
