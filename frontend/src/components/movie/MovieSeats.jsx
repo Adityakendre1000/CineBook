@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronLeft, Calendar as CalendarIcon, Clock, CreditCard } from 'lucide-react';
+import Footer from '../Footer';
 
 const BookingView = ({
   seatLayout,
@@ -58,6 +59,7 @@ const BookingView = ({
   });
 
   return (
+    <>
     <div className="max-w-5xl mx-auto pt-8 pb-20 px-4">
 
       {/* HEADER */}
@@ -138,6 +140,8 @@ const BookingView = ({
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, Ticket } from 'lucide-react';
 import { getUserBookings } from '../services/userService';
+import Footer from '../components/Footer';
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -107,6 +108,7 @@ const MyBookings = () => {
           ))}
         </div>
       )}
+      <Footer />
     </div>
   );
 };

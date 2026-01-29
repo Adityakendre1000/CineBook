@@ -1,4 +1,6 @@
 import axios from "axios";
+import { store } from "../store/store";
+import { logout as logoutRedux } from "../store/authSlice";
 
 const axiosInstance = axios.create({
     baseURL: "http://localhost:8080", // change if needed

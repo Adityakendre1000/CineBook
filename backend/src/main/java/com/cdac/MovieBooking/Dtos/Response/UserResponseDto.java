@@ -27,4 +27,8 @@ public class UserResponseDto {
     private String mobileNo;
 
     private LocalDateTime createdAt;
+
+    private UserRole userRole;
+
+    private UserStatus userStatus;
 }

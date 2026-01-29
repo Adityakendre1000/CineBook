@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Building2, MapPin } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getMovieById, getShowsByMovieId } from '../services/movieService';
+import Footer from '../components/Footer';
 
 const TheaterSelectionPage = () => {
     const navigate = useNavigate();
@@ -108,6 +109,7 @@ const TheaterSelectionPage = () => {
     if (!movie) return <div className="min-h-screen bg-[#1a1a1a] text-white flex items-center justify-center">Movie not found</div>;
 
     return (
+        <>
         <div className="min-h-screen bg-[#1a1a1a] text-white font-sans">
             <div className="max-w-4xl mx-auto pt-8 pb-20">
 
@@ -191,6 +193,8 @@ const TheaterSelectionPage = () => {
 
             </div>
         </div>
+        <Footer />
+        </>
     );
 };
 
