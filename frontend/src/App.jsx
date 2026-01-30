@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
 import ErrorPage from "./pages/ErrorPage";
 import UserView from "./pages/UserView";
 import MovieDetailPage from "./pages/MovieDetailPage";
@@ -17,6 +18,7 @@ import MyBookings from "./pages/MyBookings";
 import MovieSeats from "./components/movie/MovieSeats";
 import SeatSelectionPage from "./pages/SeatSelectionPage";
 import FeedbackPage from "./pages/FeedbackPage";
+import UserProfile from "./pages/UserProfile";
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
@@ -47,6 +49,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/terms-and-services" element={<TermsAndServices />} />
             <Route path="/movie/:id" element={<MovieDetailPage />} />
             <Route path='/movie/seats/:showId' element={<SeatSelectionPage />} />
@@ -54,6 +57,7 @@ const App = () => {
             {/* USER ROUTES */}
             <Route element={<ProtectedRoute allowedRoles={["ROLE_USER"]} />}>
               <Route path="/userview" element={<UserView />} />
+              <Route path="/profile" element={<UserProfile />} />
               <Route path="/my-bookings" element={<MyBookings />} />
               <Route path="/book/:id" element={<TheaterSelectionPage />} />
               <Route path="/feedback/:movieId" element={<FeedbackPage />} />
@@ -63,6 +67,7 @@ const App = () => {
             {/* THEATER OWNER ROUTES */}
             <Route element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]} />}>
               <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+              <Route path="/profile" element={<UserProfile />} />
               <Route path="/owner/theatres" element={<TheatreList />} />
               <Route path="/owner/theatres/:id/stats" element={<TheatreStats />} />
               <Route path="/owner/theatres/:id/manage" element={<TheatreManage />} />

@@ -1,21 +1,9 @@
-import { LogOut } from "lucide-react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
-import { logout as logoutRedux } from "../../store/authSlice";
-import { logout as logoutService } from "../../services/authService";
 import CineBookBrand from "./CineBookBrand";
+import UserProfileDropdown from "./UserProfileDropdown";
 
 const OwnerNavbar = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logoutService();
-        dispatch(logoutRedux());
-        navigate("/login");
-    };
-
 
     return (
         <nav className="p-6 flex justify-between items-center border-b border-white/10 mb-6 bg-[#1a1a1a]">
@@ -38,13 +26,8 @@ const OwnerNavbar = () => {
                     </button>
                 </div>
 
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 cursor-pointer text-red-500 hover:text-red-400 font-bold bg-red-500/10 hover:bg-red-500/20 px-4 py-2 rounded-xl transition-all"
-                >
-                    <LogOut size={18} />
-                    Logout
-                </button>
+                {/* User Profile Dropdown */}
+                <UserProfileDropdown />
             </div>
         </nav>
     );

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
 import bookingService from "../services/bookingService";
+import Footer from "../components/Footer";
 
 const BookingSuccessPage = () => {
     const navigate = useNavigate();
@@ -45,6 +46,7 @@ const BookingSuccessPage = () => {
     }
 
     return (
+        <>
         <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center px-4">
             <div className="bg-[#1e1e1e] border border-white/10 rounded-3xl p-10 max-w-lg w-full">
                 <div className="text-center mb-6">
@@ -106,6 +108,8 @@ const BookingSuccessPage = () => {
                 </div>
             </div>
         </div>
+        <Footer />
+        </>
     );
 };
 

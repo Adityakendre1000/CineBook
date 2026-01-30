@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Star, Loader2 } from 'lucide-react';
 import { getMovieById, submitMovieFeedback } from '../services/movieService';
 import { useToast } from '../context/ToastContext';
+import Footer from '../components/Footer';
 
 const FeedbackPage = () => {
     const { movieId } = useParams();
@@ -78,6 +79,7 @@ const FeedbackPage = () => {
     }
 
     return (
+        <>
         <div className="max-w-2xl mx-auto bg-[#222] p-8 rounded-lg shadow-xl border border-gray-800 mt-10">
             <h1 className="text-3xl font-bold mb-2 text-white">Rate & Review</h1>
             <h2 className="text-xl text-gray-400 mb-8">
@@ -152,6 +154,8 @@ const FeedbackPage = () => {
                 </div>
             </form>
         </div>
+        <Footer />
+        </>
     );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllMovies } from '../services/movieService';
+import Footer from '../components/Footer';
 
 const GENRES = ['Action', 'Comedy', 'Drama', 'Horror', 'Romance']; // Add your genres here
 
@@ -100,6 +101,7 @@ const CustomerView = () => {
 
 
             </div>
+            <Footer />
         </>
     );
 };

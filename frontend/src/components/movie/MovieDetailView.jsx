@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronLeft, Star, Clock, Film, Users, Ticket } from 'lucide-react';
 import PublicNavbar from '../navbar/PublicNavbar';
+import Footer from '../Footer';
 
 const MovieDetailView = ({ movie, onBack, onBookTicket }) => {
     return (
@@ -100,6 +101,7 @@ const MovieDetailView = ({ movie, onBack, onBookTicket }) => {
                 </div>
 
             </div>
+            <Footer />
         </>
     );
 };

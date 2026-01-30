@@ -1,20 +1,9 @@
-import { LogOut } from "lucide-react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
-import { logout as logoutRedux } from "../../store/authSlice";
-import { logout as logoutService } from "../../services/authService";
 import CineBookBrand from "./CineBookBrand";
+import UserProfileDropdown from "./UserProfileDropdown";
 
 const UserNavbar = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logoutService();
-        dispatch(logoutRedux());
-        navigate("/login");
-    };
 
     return (
         <nav className="p-6 flex justify-between items-center">
@@ -24,25 +13,20 @@ const UserNavbar = () => {
             <div className="flex items-center gap-6">
                 <button
                     onClick={() => navigate("/userview")}
-                    className="cursor-pointer hover:text-gray-300"
+                    className="cursor-pointer hover:text-gray-300 font-medium"
                 >
                     Home
                 </button>
 
                 <button
                     onClick={() => navigate("/my-bookings")}
-                    className="cursor-pointer hover:text-gray-300"
+                    className="cursor-pointer hover:text-gray-300 font-medium"
                 >
                     My Bookings
                 </button>
 
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 cursor-pointer text-red-400 hover:text-red-300"
-                >
-                    <LogOut size={18} />
-                    Logout
-                </button>
+                {/* User Profile Dropdown */}
+                <UserProfileDropdown />
             </div>
         </nav>
     );
